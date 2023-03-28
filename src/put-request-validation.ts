@@ -16,7 +16,7 @@ export const putRequestValidate = (body: VideoType) => {
     const errorsArr: ErrorMessages = {
         "errorsMessages": []
     };
-    if (body.title && (typeof body.title !== 'string' || body.title.length > 40)) {
+    if (!body.title || (typeof body.title !== 'string' || body.title.length > 40)) {
         let error = errorMsg("title");
 
         errorsArr.errorsMessages.push(error);
