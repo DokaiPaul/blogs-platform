@@ -47,5 +47,5 @@ export const putRequestValidate = (body: VideoType) => {
 
         errorsArr.push(error);
     }
-    return errorsArr;
+    return errorsArr[0];
 }

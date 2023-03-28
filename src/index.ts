@@ -33,9 +33,9 @@ app.delete('/testing/all-data', (req: Request, res: Response) => {
 })
 
 app.delete('/videos/:id', (req: Request, res: Response) => {
-    let index = db.find((v => v.id === +req.params.id)) //looking for index of video to delete
+    let index = db.findIndex((v => v.id === +req.params.id)) //looking for index of video to delete
 
-    if(!index) {
+    if(index === -1) {
         res.sendStatus(404);
         return;
     }
@@ -45,7 +45,7 @@ app.delete('/videos/:id', (req: Request, res: Response) => {
 
 app.post('/videos', (req: Request, res: Response) => {
     const error = postRequestValidate(req.body);
-    if(error.length > 0) {
+    if(error) {
         res.status(400).json(error)
         return;
     }
@@ -97,7 +97,7 @@ app.put('/videos/:id', (req: Request, res: Response) => {
     }
 
     const error = putRequestValidate(req.body);
-    if(error.length > 0) {
+    if(error) {
         res.status(400).json(error);
         return;
     }
