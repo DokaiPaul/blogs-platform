@@ -45,7 +45,7 @@ app.delete('/videos/:id', (req: Request, res: Response) => {
 
 app.post('/videos', (req: Request, res: Response) => {
     const error = postRequestValidate(req.body);
-    if(error) {
+    if(error.errorsMessages.length > 0) {
         res.status(400).json(error)
         return;
     }
@@ -97,7 +97,7 @@ app.put('/videos/:id', (req: Request, res: Response) => {
     }
 
     const error = putRequestValidate(req.body);
-    if(error) {
+    if(error.errorsMessages.length > 0) {
         res.status(400).json(error);
         return;
     }
