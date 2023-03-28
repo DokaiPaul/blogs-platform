@@ -8,20 +8,20 @@ export const errorMsg = (field: string) => ({
         }
     ]
 })
-export const postRequestValidate = (body: VideoType) => {
+export const putRequestValidate = (body: VideoType) => {
     const errorsArr = [];
 
-    if (typeof body.title !== 'string' || body.title.length > 40) {
+    if (body.title && (typeof body.title !== 'string' || body.title.length > 40)) {
         let error = errorMsg("title");
 
         errorsArr.push(error);
     }
-    if (typeof body.title !== 'string' || body.author.length > 20) {
+    if (body.author && (typeof body.author !== 'string' || body.author.length > 20)) {
         let error = errorMsg("author");
 
         errorsArr.push(error);
     }
-    if (body.availableResolutions.length === 0 || !body.availableResolutions.every(v => supportedResolutions.includes(v))) {
+    if (body.availableResolutions && (body.availableResolutions.length === 0 || !body.availableResolutions.every(v => supportedResolutions.includes(v)))) {
         let error = errorMsg("availableResolutions");
 
         errorsArr.push(error);
