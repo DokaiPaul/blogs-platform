@@ -33,7 +33,7 @@ app.delete('/testing/all-data', (req: Request, res: Response) => {
 })
 
 app.delete('/videos/:id', (req: Request, res: Response) => {
-    let index = db.findIndex((v => v.id === +req.params.id)) //looking for index of video to delete
+    let index = db.find((v => v.id === +req.params.id)) //looking for index of video to delete
 
     if(!index) {
         res.sendStatus(404);
