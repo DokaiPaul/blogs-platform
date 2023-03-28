@@ -11,12 +11,12 @@ export const errorMsg = (field: string) => ({
 export const postRequestValidate = (body: VideoType) => {
     const errorsArr = [];
 
-    if (typeof body.title !== 'string' || body.title.length > 40) {
+    if (body.title && (typeof body.title !== 'string' || body.title.length > 40)) {
         let error = errorMsg("title");
 
         errorsArr.push(error);
     }
-    if (typeof body.title !== 'string' || body.author.length > 20) {
+    if (body.author && (typeof body.title !== 'string' || body.author.length > 20)) {
         let error = errorMsg("author");
 
         errorsArr.push(error);
