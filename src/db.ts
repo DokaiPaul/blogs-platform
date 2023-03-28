@@ -23,7 +23,7 @@ export let db: VideoType[] = [
         id: 2,
         title: `I've bought new camera. Check it out`,
         author: 'Pavlo Dokai',
-        canBeDownloaded: false,
+        canBeDownloaded: true,
         minAgeRestriction: null,
         createdAt: "2023-03-30T20:17:51:59.1247",
         publicationDate: "2023-03-31T20:17:51:59.1247",
