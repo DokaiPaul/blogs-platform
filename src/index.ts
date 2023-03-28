@@ -63,13 +63,14 @@ app.delete('/videos/:id', (req: Request, res: Response) => {
             return;
         }
     }
-    res.send(204);
+    res.send(404);
 })
 
 app.post('/videos', (req: Request, res: Response) => {
     const title = req.body.title;
     const author = req.body.author;
-    if(title && author) {
+    const resolutions = req.body.availableResolutions
+    if(title && author && resolutions.length > 0) {
         const errorMsg = {
             "errorsMessages": [
                 {
@@ -94,16 +95,18 @@ app.post('/videos', (req: Request, res: Response) => {
         }
         let id = db.length + 1;
         const day = new Date().getDate();
-        let currentDate = new Date().toISOString();
-        let uploadedDate = new Date(new Date(currentDate).setDate(day + 1)).toISOString(); //used when user did not specify the uploaded in the body
+        let uploadedDate = new Date().toISOString() || req.body.publicationDate; //used when user did not specify the uploaded in the body
+        let createdDate = new Date(new Date(uploadedDate).setDate(day - 1)).toISOString() || req.body.createdAt;
+        let allowDownload = false || req.body.canBeDownLoaded;
+        let ageRestriction = null || req.body.minAgeRestriction;
 
         let toCreate = {
             id: id,
             title: title,
             author: author,
-            canBeDownLoaded: false,
-            minAgeRestriction: null,
-            createdAt: currentDate,
+            canBeDownLoaded: allowDownload,
+            minAgeRestriction: ageRestriction,
+            createdAt: createdDate,
             publicationDate: uploadedDate,
             availableResolutions: []
         };
