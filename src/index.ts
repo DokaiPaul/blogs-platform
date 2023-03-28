@@ -101,26 +101,27 @@ app.put('/videos/:id', (req: Request, res: Response) => {
         res.status(400).json(error);
         return;
     }
+
     if(req.body.title) {
-        video.title = req.body.title
+        video.title = req.body.title;
     }
     if(req.body.author) {
-        video.author = req.body.author
+        video.author = req.body.author;
     }
-    if(req.body.canBeDownloaded) {
-        video.canBeDownloaded = req.body.canBeDownloaded
+    if(req.body.canBeDownloaded !== undefined) { //there are cases when we need to set false for this parameter
+        video.canBeDownloaded = req.body.canBeDownloaded;
     }
     if(req.body.createdAt) {
-        video.createdAt = req.body.createdAt
+        video.createdAt = req.body.createdAt;
     }
     if(req.body.publicationDate) {
-        video.publicationDate = req.body.publicationDate
+        video.publicationDate = req.body.publicationDate;
     }
-    if(req.body.minAgeRestriction) {
-        video.minAgeRestriction = req.body.minAgeRestriction
+    if(req.body.minAgeRestriction  !== undefined) { //there are cases where we need to set null for this parameter
+        video.minAgeRestriction = req.body.minAgeRestriction;
     }
     if(req.body.availableResolutions) {
-        video.availableResolutions = req.body.availableResolutions
+        video.availableResolutions = req.body.availableResolutions;
     }
     res.sendStatus(204);
 })
