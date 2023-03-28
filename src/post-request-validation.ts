@@ -1,5 +1,11 @@
 import {supportedResolutions, VideoType} from "./db";
-
+type ErrorMessage = {
+    message: string,
+    field: string
+}
+type ErrorMessages = {
+    errorsMessages: ErrorMessage[]
+}
 export const errorMsg = (field: string) => {
         return {
             "message": "An error has been happened",
@@ -7,7 +13,7 @@ export const errorMsg = (field: string) => {
         }
     }
 export const postRequestValidate = (body: VideoType) => {
-    const errorsArr = {
+    const errorsArr: ErrorMessages = {
         "errorsMessages": []
     };
 
