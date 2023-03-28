@@ -1,45 +1,16 @@
 import express, {Request, Response} from "express";
-import bodyParser from "body-parser";
+import {db, VideoType} from "./db";
+import {postRequestValidate} from "./post-request-validation";
 
 const app = express();
 
 const port = 3000;
 
-let db = [
-    {
-        id: 0,
-        title: 'How I learn Back-end',
-        author: 'Pavlo Dokai',
-        canBeDownLoaded: true,
-        minAgeRestriction: null,
-        createdAt: "2023-03-27T20:17:51:59.1247",
-        publicationDate: "2023-03-28T20:17:51:59.1247",
-        availableResolutions: ["P720"]
-    },
-    {
-        id: 1,
-        title: 'My progress in learning',
-        author: 'Pavlo Dokai',
-        canBeDownLoaded: false,
-        minAgeRestriction: null,
-        createdAt: "2023-03-28T20:17:51:59.1247",
-        publicationDate: "2023-03-29T20:17:51:59.1247",
-        availableResolutions: ["P720"]
-    },
-    {
-        id: 2,
-        title: `I've bought new camera. Check it out`,
-        author: 'Pavlo Dokai',
-        canBeDownLoaded: false,
-        minAgeRestriction: null,
-        createdAt: "2023-03-30T20:17:51:59.1247",
-        publicationDate: "2023-03-31T20:17:51:59.1247",
-        availableResolutions: ["P720","P2160"]
-    }
-];
 
-const parserMiddlware = bodyParser();
-app.use(parserMiddlware);
+const jsonBodyMiddlware = express.json();
+app.use(jsonBodyMiddlware);
+
+
 
 app.get('/videos', (req: Request, res: Response) => {
     res.send(db);
@@ -48,77 +19,75 @@ app.get('/videos', (req: Request, res: Response) => {
 app.get('/videos/:id', (req: Request, res: Response) => {
     let video = db.find(v => v.id === +req.params.id);
     if(video) {
-        res.send(video);
+        res.json(video);
     }
     else {
-        res.send(404);
+        res.sendStatus(404);
     }
+})
+
+app.delete('/testing/all-data', (req: Request, res: Response) => {
+    db.splice(0, db.length);
+    res.sendStatus(204);
 })
 
 app.delete('/videos/:id', (req: Request, res: Response) => {
     for(let i = 0; i < db.length; i++) {
         if(db[i].id === +req.params.id) {
             db.splice(i, 1);
-            res.send(204);
+            res.sendStatus(204);
             return;
         }
     }
-    res.send(404);
+    res.sendStatus(404);
 })
 
 app.post('/videos', (req: Request, res: Response) => {
-    const title = req.body.title;
-    const author = req.body.author;
-    const resolutions = req.body.availableResolutions
-    if(title && author && resolutions.length > 0) {
-        const errorMsg = {
-            "errorsMessages": [
-                {
-                    "message": "",
-                    "field": ""
-                }
-            ]
-        }
-        if(title.length > 40) {
-            errorMsg.errorsMessages[0].message = "Title's length is longer than 40 symbols";
-            errorMsg.errorsMessages[0].field = "Title has an error";
-
-            res.sendStatus(400).send(errorMsg);
-            return;
-        }
-        else if(author.length > 20) {
-            errorMsg.errorsMessages[0].message = "Author name's length is longer than 20 symbols";
-            errorMsg.errorsMessages[0].field = "Author has an error";
-
-            res.sendStatus(400).send(errorMsg);
-            return;
-        }
-        let id = db.length + 1;
-        const day = new Date().getDate();
-        let uploadedDate = new Date().toISOString() || req.body.publicationDate; //used when user did not specify the uploaded in the body
-        let createdDate = new Date(new Date(uploadedDate).setDate(day - 1)).toISOString() || req.body.createdAt;
-        let allowDownload = false || req.body.canBeDownLoaded;
-        let ageRestriction = null || req.body.minAgeRestriction;
-
-        let toCreate = {
-            id: id,
-            title: title,
-            author: author,
-            canBeDownLoaded: allowDownload,
-            minAgeRestriction: ageRestriction,
-            createdAt: createdDate,
-            publicationDate: uploadedDate,
-            availableResolutions: []
-        };
-
-        db.push(toCreate);
-        res.sendStatus(201).send(toCreate);
+    const error = postRequestValidate(req.body);
+    if(error.length > 0) {
+        res.status(400).json(error)
         return;
     }
-    res.send(400);
+    const title = req.body.title;
+    const author = req.body.author;
+    const resolutions = req.body.availableResolutions;
+    const day = new Date().getDate();
+
+    let createdDate = new Date().toISOString();
+    if(req.body.createdAt) {
+        createdDate = req.body.createdAt
+    }
+    let publicateDate = new Date(new Date(createdDate).setDate(day + 1)).toISOString();
+    if(req.body.publicationDate) {
+        publicateDate = req.body.publicationDate
+    }
+    let allowDownload: boolean = false;
+    if(req.body.canBeDownloaded) {
+        allowDownload = req.body.canBeDownloaded
+    }
+    let ageRestriction = null;
+    if(req.body.minAgeRestriction) {
+        ageRestriction = req.body.minAgeRestriction
+    }
+    const id: number = db.reduce((acc: number,v: VideoType) => acc < v.id
+        ? acc = v.id
+        : acc, 0) + 1;
+
+    let toCreate: VideoType = {
+        id: id,
+        title: title,
+        author: author,
+        canBeDownloaded: allowDownload,
+        minAgeRestriction: ageRestriction,
+        createdAt: createdDate,
+        publicationDate: publicateDate,
+        availableResolutions: resolutions
+    };
+
+    db.push(toCreate);
+    res.status(201).json(toCreate);
 })
 
 app.listen(port, () => {
-    // console.log(`App has been launched on port ${port}`);
-    console.log(db)
+    console.log(`App has been launched on port ${port}`);
 })
