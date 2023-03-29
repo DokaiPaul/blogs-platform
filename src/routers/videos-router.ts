@@ -1,23 +1,15 @@
-import express, {Request, Response} from "express";
-import {db, VideoType} from "./db";
-import {postRequestValidate} from "./post-request-validation";
-import {putRequestValidate} from "./put-request-validation";
+import {Request, Response, Router} from "express";
+import {db} from "../database/db";
+import {postRequestValidate} from "../validation/post-request-validation";
+import {VideoType} from "../types/videos-types";
+import {putRequestValidate} from "../validation/put-request-validation";
 
-const app = express();
-
-const port = 3000;
-
-
-const jsonBodyMiddlware = express.json();
-app.use(jsonBodyMiddlware);
-
-
-
-app.get('/videos', (req: Request, res: Response) => {
+export const videosRouter = Router({})
+videosRouter.get('/', (req: Request, res: Response) => {
     res.send(db);
 })
 
-app.get('/videos/:id', (req: Request, res: Response) => {
+videosRouter.get('/:id', (req: Request, res: Response) => {
     let video = db.find(v => v.id === +req.params.id);
     if(video) {
         res.json(video);
@@ -27,12 +19,7 @@ app.get('/videos/:id', (req: Request, res: Response) => {
     }
 })
 
-app.delete('/testing/all-data', (req: Request, res: Response) => {
-    db.splice(0, db.length);
-    res.sendStatus(204);
-})
-
-app.delete('/videos/:id', (req: Request, res: Response) => {
+videosRouter.delete('/:id', (req: Request, res: Response) => {
     let index = db.findIndex((v => v.id === +req.params.id)) //looking for index of video to delete
 
     if(index === -1) {
@@ -43,7 +30,7 @@ app.delete('/videos/:id', (req: Request, res: Response) => {
     res.sendStatus(204);
 })
 
-app.post('/videos', (req: Request, res: Response) => {
+videosRouter.post('/', (req: Request, res: Response) => {
     const error = postRequestValidate(req.body);
     if(error.errorsMessages.length > 0) {
         res.status(400).json(error)
@@ -52,7 +39,6 @@ app.post('/videos', (req: Request, res: Response) => {
     const title = req.body.title;
     const author = req.body.author;
     const resolutions = req.body.availableResolutions;
-    const day = new Date().getDate();
 
     let createdDate = new Date().toISOString();
     if(req.body.createdAt) {
@@ -89,7 +75,7 @@ app.post('/videos', (req: Request, res: Response) => {
     res.status(201).json(toCreate);
 })
 
-app.put('/videos/:id', (req: Request, res: Response) => {
+videosRouter.put('/:id', (req: Request, res: Response) => {
     let video = db.find(v => v.id === +req.params.id);
     if(!video) {
         res.sendStatus(404);
@@ -124,8 +110,4 @@ app.put('/videos/:id', (req: Request, res: Response) => {
         video.availableResolutions = req.body.availableResolutions;
     }
     res.sendStatus(204);
-})
-
-app.listen(port, () => {
-    console.log(`App has been launched on port ${port}`);
 })

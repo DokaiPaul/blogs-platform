@@ -1,33 +1,24 @@
-import {supportedResolutions, VideoType} from "./db";
-type ErrorMessage = {
-    message: string,
-    field: string
-}
-type ErrorMessages = {
-    errorsMessages: ErrorMessage[]
-}
-export const errorMsg = (field: string) => {
-        return {
-            "message": "An error has been happened",
-            "field": field
-        }
-    }
-export const postRequestValidate = (body: VideoType) => {
+import {supportedResolutions} from "../database/db";
+import {ErrorMessages} from "../types/errors-types";
+import {VideoType} from "../types/videos-types";
+import {errorMsg} from "../errors/errors";
+
+
+export const putRequestValidate = (body: VideoType) => {
     const errorsArr: ErrorMessages = {
         "errorsMessages": []
     };
-
-    if (typeof body.title !== 'string' || body.title.length > 40) {
+    if (!body.title || (typeof body.title !== 'string' || body.title.length > 40)) {
         let error = errorMsg("title");
 
         errorsArr.errorsMessages.push(error);
     }
-    if (typeof body.author !== 'string' || body.author.length > 20) {
+    if (body.author && (typeof body.author !== 'string' || body.author.length > 20)) {
         let error = errorMsg("author");
 
         errorsArr.errorsMessages.push(error);
     }
-    if (body.availableResolutions.length === 0 || !body.availableResolutions.every(v => supportedResolutions.includes(v))) {
+    if (body.availableResolutions && (body.availableResolutions.length === 0 || !body.availableResolutions.every(v => supportedResolutions.includes(v)))) {
         let error = errorMsg("availableResolutions");
 
         errorsArr.errorsMessages.push(error);
