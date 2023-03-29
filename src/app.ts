@@ -1,16 +1,11 @@
-import express from "express";
-import {testingRouter} from "./routers/testing-router";
-import {videosRouter} from "./routers/videos-router";
+import {app} from "./settings";
 
-const app = express();
 
-const port = 3000;
 
-const jsonBodyMiddleware = express.json();
-app.use(jsonBodyMiddleware);
+const port = process.env.PORT ||3000;
 
-app.use('/testing', testingRouter);
-app.use('/videos', videosRouter);
+
+
 
 
 app.listen(port, () => {
