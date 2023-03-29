@@ -1,4 +1,4 @@
-type ErrorMessage = {
+export type ErrorMessage = {
     message: string,
     field: string
 }
