@@ -8,7 +8,7 @@ const jsonBodyMiddleware = express.json();
 app.use(jsonBodyMiddleware);
 
 app.get('/', (req: Request, res: Response) => {
-    res.send('Hello! Checkout my videos by adding "/videos" to the current URL')
+    res.send('Hello! Checkout all videos by adding "/videos" to the current URL')
 })
 
 app.use('/testing', testingRouter);

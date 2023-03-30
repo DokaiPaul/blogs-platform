@@ -4,6 +4,7 @@ import {postRequestValidate} from "../validation/post-request-validation";
 import {VideoType} from "../types/videos-types";
 import {putRequestValidate} from "../validation/put-request-validation";
 
+
 export const videosRouter = Router({})
 videosRouter.get('/', (req: Request, res: Response) => {
     res.send(db);
