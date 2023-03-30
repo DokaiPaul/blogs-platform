@@ -9,6 +9,7 @@ export const postRequestValidate = (body: VideoType) => {
     };
 
     try {
+        //check if the body from request contains properties. If not, create error message and get out of the function
         if(Object.keys(body).length === 0) {
             let error = errorMsg("body");
             errorsArr.errorsMessages.push(error);

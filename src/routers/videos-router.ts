@@ -23,43 +23,52 @@ videosRouter.get('/:id', (req: Request, res: Response) => {
 videosRouter.delete('/:id', (req: Request, res: Response) => {
     let index = db.findIndex((v => v.id === +req.params.id)) //looking for index of video to delete
 
+    //if id doesn't exist throw status 404 and get out of the function
     if(index === -1) {
         res.sendStatus(404);
         return;
     }
+    //delete the object and return status 204
     db.splice(index, 1);
     res.sendStatus(204);
 })
 
 videosRouter.post('/', (req: Request, res: Response) => {
+    //if error send the errorMessage and get out of the function
     const error = postRequestValidate(req.body);
     if(error.errorsMessages.length > 0) {
         res.status(400).json(error)
         return;
     }
+
+    //required values from the body request
     const title = req.body.title;
     const author = req.body.author;
     const resolutions = req.body.availableResolutions;
 
+    //block with default data to pass in the created object
     let createdDate = new Date().toISOString();
-    if(req.body.createdAt) {
-        createdDate = req.body.createdAt
-    }
     let publicateDate = new Date(new Date(createdDate).setDate(new Date(createdDate).getDate() + 1)).toISOString();
-    if(req.body.publicationDate) {
-        publicateDate = req.body.publicationDate
-    }
-    let allowDownload: boolean = false;
-    if(req.body.canBeDownloaded) {
-        allowDownload = req.body.canBeDownloaded
-    }
+    let allowDownload = false;
     let ageRestriction = null;
-    if(req.body.minAgeRestriction) {
-        ageRestriction = req.body.minAgeRestriction
-    }
+
     const id: number = db.reduce((acc: number,v: VideoType) => acc < v.id
         ? acc = v.id
         : acc, 0) + 1;
+
+    //if properties have been passed in body request reassign the default value for the object
+    if(req.body.createdAt) {
+        createdDate = req.body.createdAt
+    }
+    if(req.body.publicationDate) {
+        publicateDate = req.body.publicationDate
+    }
+    if(req.body.canBeDownloaded) {
+        allowDownload = req.body.canBeDownloaded
+    }
+    if(req.body.minAgeRestriction) {
+        ageRestriction = req.body.minAgeRestriction
+    }
 
     let toCreate: VideoType = {
         id: id,
@@ -83,12 +92,14 @@ videosRouter.put('/:id', (req: Request, res: Response) => {
         return;
     }
 
+    //if error send the errorMessage and get out of the function
     const error = putRequestValidate(req.body);
     if(error.errorsMessages.length > 0) {
         res.status(400).json(error);
         return;
     }
 
+    //blocks to update properties of the updated object
     if(req.body.title) {
         video.title = req.body.title;
     }
