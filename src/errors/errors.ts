@@ -1,8 +1,9 @@
 import {ErrorMessage} from "../types/errors-types";
+import {strict} from "assert";
 
-export const errorMsg = (field: string): ErrorMessage => {
+export const errorMsg = (message: string, field: string): ErrorMessage => {
     return {
-        "message": "An error has been happened",
+        "message": message,
         "field": field
     }
 }

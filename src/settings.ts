@@ -1,6 +1,7 @@
 import express, {Request, Response} from "express";
 import {testingRouter} from "./routers/testing-router";
 import {videosRouter} from "./routers/videos-router";
+import {blogsRouter} from "./routers/blogs-router";
 
 export const app = express();
 
@@ -13,3 +14,4 @@ app.get('/', (req: Request, res: Response) => {
 
 app.use('/testing', testingRouter);
 app.use('/videos', videosRouter);
+app.use('/blogs', blogsRouter);

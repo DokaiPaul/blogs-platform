@@ -20,7 +20,7 @@ describe('/videos', () => {
             .send({})
             .expect(400, {
                 errorsMessages: [
-                    { message: 'An error has been happened', field: 'body' }
+                    { message: 'Your body does not have any property', field: 'body' }
                 ],
             })
 

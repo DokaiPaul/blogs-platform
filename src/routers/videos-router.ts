@@ -48,7 +48,7 @@ videosRouter.post('/', (req: Request, res: Response) => {
 
     //block with default data to pass in the created object
     let createdDate = new Date().toISOString();
-    let publicateDate = new Date(new Date(createdDate).setDate(new Date(createdDate).getDate() + 1)).toISOString();
+    let publicateDate;
     let allowDownload = false;
     let ageRestriction = null;
 
@@ -62,6 +62,9 @@ videosRouter.post('/', (req: Request, res: Response) => {
     }
     if(req.body.publicationDate) {
         publicateDate = req.body.publicationDate
+    }
+    else {
+        publicateDate = new Date(new Date(createdDate).setDate(new Date(createdDate).getDate() + 1)).toISOString(); //+1 day
     }
     if(req.body.canBeDownloaded) {
         allowDownload = req.body.canBeDownloaded
