@@ -1,14 +1,9 @@
 import {Router, Response, Request} from "express";
 import {posts_db} from "../database/posts-db";
-import {blogs_db} from "../database/blogs-db";
-import request from "supertest";
-import {resolve} from "dns";
 import {authorizationMiddleware} from "../middlewares/authorization-middleware";
 import {inputValidationMiddleware} from "../middlewares/input-validation-middleware";
 import {postBodyValidationMiddleware} from "../middlewares/blog-body-validation-middleware";
 import {postsRepository} from "../repositories/posts-repository";
-import {blogsRepository} from "../repositories/blogs-repository";
-import {blogsRouter} from "./blogs-router";
 
 export const postsRouter = Router({});
 

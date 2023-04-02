@@ -33,19 +33,19 @@ export const postBodyValidationMiddleware = [
         .isString()
         .withMessage('Title should be a string')
         .bail()
-        .trim().isLength({max: 30})
+        .trim().isLength({min: 1, max: 30})
         .withMessage('Title should be not longer than 30 symbols'),
     body('shortDescription')
         .isString()
         .withMessage('Description should be a string')
         .bail()
-        .trim().isLength({max: 100})
+        .trim().isLength({min: 1, max: 100})
         .withMessage('Title should be not longer than 100 symbols'),
     body('content')
         .isString()
         .withMessage('Content should be a string')
         .bail()
-        .trim().isLength({max: 1000})
+        .trim().isLength({min: 1, max: 1000})
         .withMessage('Title should be not longer than 1000 symbols'),
     body('blogId')
         .isString()
