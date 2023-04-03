@@ -1,5 +1,5 @@
 import {Request, Response, Router} from "express";
-import {db} from "../database/db";
+import {videos_db} from "../database/videos_db";
 import {postRequestValidate} from "../validation/post-request-validation";
 import {VideoType} from "../types/videos-types";
 import {putRequestValidate} from "../validation/put-request-validation";
@@ -7,11 +7,11 @@ import {putRequestValidate} from "../validation/put-request-validation";
 
 export const videosRouter = Router({})
 videosRouter.get('/', (req: Request, res: Response) => {
-    res.send(db);
+    res.send(videos_db);
 })
 
 videosRouter.get('/:id', (req: Request, res: Response) => {
-    let video = db.find(v => v.id === +req.params.id);
+    let video = videos_db.find(v => v.id === +req.params.id);
     if(video) {
         res.json(video);
     }
@@ -21,7 +21,7 @@ videosRouter.get('/:id', (req: Request, res: Response) => {
 })
 
 videosRouter.delete('/:id', (req: Request, res: Response) => {
-    let index = db.findIndex((v => v.id === +req.params.id)) //looking for index of video to delete
+    let index = videos_db.findIndex((v => v.id === +req.params.id)) //looking for index of video to delete
 
     //if id doesn't exist throw status 404 and get out of the function
     if(index === -1) {
@@ -29,7 +29,7 @@ videosRouter.delete('/:id', (req: Request, res: Response) => {
         return;
     }
     //delete the object and return status 204
-    db.splice(index, 1);
+    videos_db.splice(index, 1);
     res.sendStatus(204);
 })
 
@@ -52,7 +52,7 @@ videosRouter.post('/', (req: Request, res: Response) => {
     let allowDownload = false;
     let ageRestriction = null;
 
-    const id: number = db.reduce((acc: number,v: VideoType) => acc < v.id
+    const id: number = videos_db.reduce((acc: number, v: VideoType) => acc < v.id
         ? acc = v.id
         : acc, 0) + 1;
 
@@ -84,12 +84,12 @@ videosRouter.post('/', (req: Request, res: Response) => {
         availableResolutions: resolutions
     };
 
-    db.push(toCreate);
+    videos_db.push(toCreate);
     res.status(201).json(toCreate);
 })
 
 videosRouter.put('/:id', (req: Request, res: Response) => {
-    let video = db.find(v => v.id === +req.params.id);
+    let video = videos_db.find(v => v.id === +req.params.id);
     if(!video) {
         res.sendStatus(404);
         return;

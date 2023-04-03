@@ -1,7 +1,7 @@
+
 // @ts-ignore
 import request from "supertest";
 import {app} from "../src/settings";
-import exp = require("constants");
 
 describe('/blogs', () => {
     beforeAll(async () => {

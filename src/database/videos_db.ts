@@ -1,6 +1,6 @@
 import {VideoType} from "../types/videos-types";
 
-export let db: VideoType[] = [
+export let videos_db: VideoType[] = [
     {
         id: 0,
         title: 'How I learn Back-end',
