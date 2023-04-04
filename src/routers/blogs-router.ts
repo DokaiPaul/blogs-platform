@@ -1,5 +1,4 @@
 import {Request, Response, Router} from "express";
-import {blogs_db} from "../database/blogs-db";
 import {blogBodyValidationMiddleware} from "../middlewares/blog-body-validation-middleware";
 import {blogsRepository} from "../repositories/blogs-repository";
 import {inputValidationMiddleware} from "../middlewares/input-validation-middleware";
@@ -11,11 +10,12 @@ export const blogsRouter = Router({})
 
 
 blogsRouter.get('/', (req: Request, res: Response) => {
-    res.send(blogs_db);
+    const blogs = blogsRepository.getAllRepositories();
+    res.send(blogs);
 })
 
 blogsRouter.get('/:id', (req: Request, res: Response) => {
-    const blog = blogs_db.find(v => v.id === req.params.id);
+    const blog = blogsRepository.getRepositoryById(req.params.id);
     if(!blog) {
         res.sendStatus(404);
         return;
@@ -32,7 +32,7 @@ blogsRouter.post('/' , requiredFieldsValidationMiddleware, blogBodyValidationMid
 
 blogsRouter.put('/:id', requiredFieldsValidationMiddleware, blogBodyValidationMiddleware, inputValidationMiddleware,
     (req: Request, res: Response) => {
-        let blog = blogs_db.find(v => v.id === req.params.id);
+        let blog = blogsRepository.getRepositoryById(req.params.id);
         if(!blog) {
             res.sendStatus(404);
             return;
@@ -42,12 +42,6 @@ blogsRouter.put('/:id', requiredFieldsValidationMiddleware, blogBodyValidationMi
 })
 
 blogsRouter.delete('/:id', inputValidationMiddleware, (req: Request, res: Response) => {
-    const index = blogs_db.findIndex(b => b.id === req.params.id)
-
-    if(index === -1) {
-        res.sendStatus(404);
-        return;
-    }
-    blogs_db.splice(index, 1);
-    res.sendStatus(204);
+    const status = blogsRepository.deleteRepository(req.params.id)
+    res.sendStatus(status);
 })

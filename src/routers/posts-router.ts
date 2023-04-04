@@ -1,5 +1,4 @@
 import {Router, Response, Request} from "express";
-import {posts_db} from "../database/posts-db";
 import {authorizationMiddleware} from "../middlewares/authorization-middleware";
 import {inputValidationMiddleware} from "../middlewares/input-validation-middleware";
 import {postBodyValidationMiddleware} from "../middlewares/blog-body-validation-middleware";
@@ -8,11 +7,12 @@ import {postsRepository} from "../repositories/posts-repository";
 export const postsRouter = Router({});
 
 postsRouter.get('/', (req: Request, res: Response) => {
-    res.send(posts_db);
+    const posts = postsRepository.getAllRepositories()
+    res.send(posts);
 })
 
 postsRouter.get('/:id', (req: Request, res: Response) => {
-    const post = posts_db.find(v => v.id === req.params.id);
+    const post = postsRepository.getRepositoryByID(req.params.id);
     if(!post) {
         res.sendStatus(404);
         return;
@@ -27,7 +27,7 @@ postsRouter.post('/',postBodyValidationMiddleware ,inputValidationMiddleware, (r
 })
 
 postsRouter.put('/:id', postBodyValidationMiddleware ,inputValidationMiddleware,(req: Request, res: Response) => {
-    let post = posts_db.find(v => v.id === req.params.id);
+    let post = postsRepository.getRepositoryByID(req.params.id);
     if(!post) {
         res.sendStatus(404);
         return;
@@ -37,12 +37,6 @@ postsRouter.put('/:id', postBodyValidationMiddleware ,inputValidationMiddleware,
 })
 
 postsRouter.delete('/:id', inputValidationMiddleware, (req: Request, res: Response) => {
-    const index = posts_db.findIndex(b => b.id === req.params.id)
-
-    if(index === -1) {
-        res.sendStatus(404);
-        return;
-    }
-    posts_db.splice(index, 1);
-    res.sendStatus(204);
+    const status = postsRepository.deleteRepository(req.params.id)
+    res.sendStatus(status);
 })
