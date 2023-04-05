@@ -6,7 +6,7 @@ import {
     websiteUrlValidationMiddleware
 } from "./common-validation-middleware";
 
-export const blogBodyValidationMiddleware = [
+export const bodyValidationMiddleware = [
     nameValidationMiddleware,
     descriptionValidationMiddleware,
     websiteUrlValidationMiddleware

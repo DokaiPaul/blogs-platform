@@ -287,11 +287,11 @@ describe('/blogs', () => {
             .set('authorization', 'Basic YWRtaW46cXdlcnR5')
             .expect(204)
 
-        const responce = await request(app)
+        const response = await request(app)
             .get('/blogs/' + createdPost.id)
             .expect(200)
 
-        expect(responce.body).toEqual({
+        expect(response.body).toEqual({
             id: createdPost.id,
             name: 'UPD by tests',
             description: 'Updated description',

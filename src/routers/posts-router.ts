@@ -1,18 +1,18 @@
 import {Router, Response, Request} from "express";
 import {authorizationMiddleware} from "../middlewares/authorization-middleware";
 import {inputValidationMiddleware} from "../middlewares/input-validation-middleware";
-import {postBodyValidationMiddleware} from "../middlewares/blog-body-validation-middleware";
+import {postBodyValidationMiddleware} from "../middlewares/body-validation-middleware";
 import {postsRepository} from "../repositories/posts-repository";
 
 export const postsRouter = Router({});
 
-postsRouter.get('/', (req: Request, res: Response) => {
-    const posts = postsRepository.getAllRepositories()
+postsRouter.get('/', async (req: Request, res: Response) => {
+    const posts = await postsRepository.getAllPosts()
     res.send(posts);
 })
 
-postsRouter.get('/:id', (req: Request, res: Response) => {
-    const post = postsRepository.getRepositoryByID(req.params.id);
+postsRouter.get('/:id', async (req: Request, res: Response) => {
+    const post = await postsRepository.getPostById(req.params.id);
     if(!post) {
         res.sendStatus(404);
         return;
@@ -21,22 +21,26 @@ postsRouter.get('/:id', (req: Request, res: Response) => {
 })
 
 postsRouter.use(authorizationMiddleware);
-postsRouter.post('/',postBodyValidationMiddleware ,inputValidationMiddleware, (req: Request, res: Response) => {
-    const newPost = postsRepository.createRepository(req.body)
+postsRouter.post('/',postBodyValidationMiddleware ,inputValidationMiddleware, async (req: Request, res: Response) => {
+    const newPost = await postsRepository.createPost(req.body)
     res.status(201).json(newPost)
 })
 
-postsRouter.put('/:id', postBodyValidationMiddleware ,inputValidationMiddleware,(req: Request, res: Response) => {
-    let post = postsRepository.getRepositoryByID(req.params.id);
+postsRouter.put('/:id', postBodyValidationMiddleware ,inputValidationMiddleware,async (req: Request, res: Response) => {
+    let post = await postsRepository.getPostById(req.params.id);
     if(!post) {
         res.sendStatus(404);
         return;
     }
-    postsRepository.updateRepository(post ,req.body)
+    await postsRepository.updatePost(post ,req.body)
     res.sendStatus(204)
 })
 
-postsRouter.delete('/:id', inputValidationMiddleware, (req: Request, res: Response) => {
-    const status = postsRepository.deleteRepository(req.params.id)
-    res.sendStatus(status);
+postsRouter.delete('/:id', inputValidationMiddleware, async (req: Request, res: Response) => {
+    const result = await postsRepository.deletePost(req.params.id)
+    if(!result) {
+        res.sendStatus(404);
+        return;
+    }
+    res.sendStatus(204);
 })

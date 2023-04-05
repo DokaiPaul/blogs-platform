@@ -40,14 +40,14 @@ export const shortDescriptionValidationMiddleware = body('shortDescription')
     .withMessage('Description should be a string')
     .bail()
     .trim().isLength({min: 1, max: 100})
-    .withMessage('Title should be not longer than 100 symbols');
+    .withMessage('Description should be not longer than 100 symbols');
 
 export const contentValidationMiddleware = body('content')
     .isString()
     .withMessage('Content should be a string')
     .bail()
     .trim().isLength({min: 1, max: 1000})
-    .withMessage('Title should be not longer than 1000 symbols');
+    .withMessage('Content should be not longer than 1000 symbols');
 
 export const blogIdValidationMiddleware = body('blogId')
     .isString()

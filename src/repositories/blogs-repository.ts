@@ -3,15 +3,15 @@ import {blogs_db} from "../database/blogs-db";
 import {stat} from "fs";
 
 export const blogsRepository = {
-    getAllRepositories(): BlogsType[] {
+    async getAllBlogs (): Promise<BlogsType[]> {
         const blogs = blogs_db;
         return blogs;
     },
-    getRepositoryById(id: string): BlogsType | undefined {
+    async getBlogById (id: string): Promise<BlogsType | undefined> {
         const blog = blogs_db.find(b => b.id === id)
         return blog;
     },
-    createRepository (body: BlogInputType): BlogsType {
+    async createBlog (body: BlogInputType): Promise<BlogsType> {
         const newBlog = {
             id: Date.now().toString(),
             name: body.name,
@@ -21,20 +21,18 @@ export const blogsRepository = {
         blogs_db.push(newBlog)
         return newBlog;
     },
-    updateRepository (blog: BlogsType ,body:BlogInputType): void {
+    async updateBlog (blog: BlogsType , body:BlogInputType): Promise<void> {
         body.name ? blog.name = body.name : null
         body.description ? blog.description = body.description : null
         body.websiteUrl ? blog.websiteUrl = body.websiteUrl : null
     },
-    deleteRepository(id: string): number {
+    async deleteBlog (id: string): Promise<boolean> {
         const index: number = blogs_db.findIndex(b => b.id === id)
-        let status: number;
+
         if(index === -1) {
-            status = 404;
-            return status;
+            return false;
         }
-        status = 204;
         blogs_db.splice(index, 1);
-        return status;
+        return true;
     }
 }
