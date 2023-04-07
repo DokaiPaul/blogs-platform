@@ -21,18 +21,18 @@ postsRouter.get('/:id', async (req: Request, res: Response) => {
 })
 
 postsRouter.use(authorizationMiddleware);
-postsRouter.post('/',postBodyValidationMiddleware ,inputValidationMiddleware, async (req: Request, res: Response) => {
-    const newPost = await postsRepository.createPost(req.body)
-    res.status(201).json(newPost)
+postsRouter.post('/',postBodyValidationMiddleware ,inputValidationMiddleware,
+    async (req: Request, res: Response) => {
+        const newPost = await postsRepository.createPost(req.body)
+        res.status(201).json(newPost)
 })
 
 postsRouter.put('/:id', postBodyValidationMiddleware ,inputValidationMiddleware,async (req: Request, res: Response) => {
-    let post = await postsRepository.getPostById(req.params.id);
+    let post = await postsRepository.updatePost(req.params.id ,req.body)
     if(!post) {
         res.sendStatus(404);
         return;
     }
-    await postsRepository.updatePost(post ,req.body)
     res.sendStatus(204);
 })
 

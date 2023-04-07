@@ -1,43 +1,50 @@
 import {InputPostType, PostsType} from "../types/posts-types";
 import {blogs_db} from "../database/blogs-db";
 import {posts_db} from "../database/posts-db";
+import {client} from "../database/mongo-db";
+import {blogsCollection} from "./blogs-repository";
 
+const postCollection = client.db('bloggers-platform').collection<PostsType>('posts')
 export const postsRepository = {
     async getAllPosts (): Promise<PostsType[]> {
-        return posts_db;
+        const posts = postCollection.find({}, {projection: {_id: 0}}).toArray();
+        return posts;
     },
-    async getPostById (id: string): Promise<PostsType | undefined> {
-        const post = posts_db.find(v => v.id === id)
+    async getPostById (id: string): Promise<PostsType | null> {
+        const post = postCollection.findOne({id: id}, {projection: {_id: 0}})
         return post;
     },
     async createPost (body: PostsType): Promise<PostsType> {
-
+    const blogName = await blogsCollection.findOne({id: body.blogId})
         const newPost = {
             id: Date.now().toString(),
             title: body.title,
             shortDescription: body.shortDescription,
             content: body.content,
             blogId: body.blogId,
-            blogName: blogs_db.find(b => b.id === body.blogId)?.name
+            blogName: blogName?.name,
+            createdAt: new Date().toISOString(),
         }
 
         // @ts-ignore
-        posts_db.push(newPost)
+        const result = await postCollection.insertOne(newPost)
         // @ts-ignore
-        return newPost
+        const {_id, ...post} = newPost;
+        // @ts-ignore
+        return post
     },
-    async updatePost (post: PostsType, body: InputPostType): Promise<void> {
-        body.title ? post.title = body.title : null
-        body.shortDescription ? post.shortDescription = body.shortDescription : null
-        body.content ? post.content = body.content : null
-        body.blogId ? post.blogId = body.blogId : null
+    async updatePost (id: string, body: InputPostType): Promise<boolean> {
+        const result = await  postCollection.updateOne({id: id}, {$set: {
+            title: body.title,
+            shortDescription: body.shortDescription,
+            content: body.content,
+            blogId: body.blogId
+        }});
+
+        return result.matchedCount === 1
     },
     async deletePost (id: string): Promise<boolean> {
-        const index: number = posts_db.findIndex(b => b.id === id);
-        if(index === -1) {
-            return false;
-        }
-        posts_db.splice(index, 1);
-        return true;
+        const result = await  postCollection.deleteOne({id: id})
+        return result.deletedCount === 1;
     }
 }

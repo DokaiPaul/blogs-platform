@@ -4,7 +4,8 @@ export type PostsType = {
     shortDescription: string,
     content: string,
     blogId: string,
-    blogName: string
+    blogName: string,
+    createdAt: string
 }
 
 export type InputPostType = {

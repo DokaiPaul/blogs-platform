@@ -1,5 +1,6 @@
 import {body} from "express-validator";
 import {blogs_db} from "../database/blogs-db";
+import {blogsRepository} from "../repositories/blogs-repository";
 
 export const nameValidationMiddleware = body('name')
     .if(body('name').notEmpty())
@@ -53,8 +54,9 @@ export const blogIdValidationMiddleware = body('blogId')
     .isString()
     .withMessage('Blog ID should be a string')
     .bail()
-    .custom((value) => {
-        if(!blogs_db.find(b => b.id === value)) {
+    .custom(async (value) => {
+
+        if (!await blogsRepository.getBlogById(value)) {
             throw new Error('This blogs ID does not exists')
         }
         return true;

@@ -2,12 +2,14 @@ import {Request, Response, Router} from "express";
 import {videos_db} from "../database/videos_db";
 import {blogs_db} from "../database/blogs-db";
 import {posts_db} from "../database/posts-db";
+import {client} from "../database/mongo-db";
+import {PostsType} from "../types/posts-types";
 
 export const testingRouter = Router({})
 
-testingRouter.delete('/all-data', (req: Request, res: Response) => {
+testingRouter.delete('/all-data', async (req: Request, res: Response) => {
+    await client.db('bloggers-platform').collection<PostsType>('posts').deleteMany({})
+    await client.db('bloggers-platform').collection<PostsType>('blogs').deleteMany({})
     videos_db.splice(0, videos_db.length);
-    blogs_db.splice(0,  blogs_db.length);
-    posts_db.splice(0, posts_db.length);
     res.sendStatus(204);
 })

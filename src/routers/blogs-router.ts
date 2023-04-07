@@ -32,12 +32,11 @@ blogsRouter.post('/' , requiredFieldsValidationMiddleware, bodyValidationMiddlew
 
 blogsRouter.put('/:id', requiredFieldsValidationMiddleware, bodyValidationMiddleware, inputValidationMiddleware,
     async (req: Request, res: Response) => {
-        const blog = await blogsRepository.getBlogById(req.params.id);
+        const blog = await blogsRepository.updateBlog(req.params.id ,req.body)
         if(!blog) {
             res.sendStatus(404);
             return;
         }
-        await blogsRepository.updateBlog(blog ,req.body)
         res.sendStatus(204)
 })
 

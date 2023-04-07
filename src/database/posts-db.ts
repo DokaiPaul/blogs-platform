@@ -7,6 +7,7 @@ export const posts_db: PostsType[] = [
         shortDescription: 'This post is about lots of myths about cooking and its difficulty',
         content: 'bla-bla-bla. Regular longread',
         blogId: '1',
-        blogName: 'Cooking is fun'
+        blogName: 'Cooking is fun',
+        createdAt: 'date'
     }
 ]
