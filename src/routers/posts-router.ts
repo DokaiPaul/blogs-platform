@@ -33,7 +33,7 @@ postsRouter.put('/:id', postBodyValidationMiddleware ,inputValidationMiddleware,
         return;
     }
     await postsRepository.updatePost(post ,req.body)
-    res.sendStatus(204)
+    res.sendStatus(204);
 })
 
 postsRouter.delete('/:id', inputValidationMiddleware, async (req: Request, res: Response) => {
