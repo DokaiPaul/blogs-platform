@@ -1,23 +1,29 @@
 import {InputPostType, PostsType} from "../types/posts-types";
-import {blogs_db} from "../database/blogs-db";
-import {posts_db} from "../database/posts-db";
 import {client} from "../database/mongo-db";
-import {blogsCollection} from "./blogs-repository";
+import {BlogsType} from "../types/blogs-types";
+import {changeKeyName} from "../utils/object-operations";
+import {ObjectId} from "mongodb";
 
 const postCollection = client.db('bloggers-platform').collection<PostsType>('posts')
+const blogsCollection = client.db('bloggers-platform').collection<BlogsType>('blogs')
 export const postsRepository = {
     async getAllPosts (): Promise<PostsType[]> {
-        const posts = postCollection.find({}, {projection: {_id: 0}}).toArray();
+        const posts = await postCollection.find({}).toArray();
+        posts.forEach(b => changeKeyName(b, '_id','id'));
         return posts;
     },
     async getPostById (id: string): Promise<PostsType | null> {
-        const post = postCollection.findOne({id: id}, {projection: {_id: 0}})
+        // @ts-ignore
+        const post = postCollection.findOne({_id: ObjectId(id)})
+        if(!post) {
+            return null;
+        }
+        changeKeyName(post, '_id', 'id')
         return post;
     },
     async createPost (body: PostsType): Promise<PostsType> {
     const blogName = await blogsCollection.findOne({id: body.blogId})
         const newPost = {
-            id: Date.now().toString(),
             title: body.title,
             shortDescription: body.shortDescription,
             content: body.content,
@@ -27,14 +33,14 @@ export const postsRepository = {
         }
 
         // @ts-ignore
-        const result = await postCollection.insertOne(newPost)
+        await postCollection.insertOne(newPost)
+        changeKeyName(newPost, '_id', 'id')
         // @ts-ignore
-        const {_id, ...post} = newPost;
-        // @ts-ignore
-        return post
+        return newPost;
     },
     async updatePost (id: string, body: InputPostType): Promise<boolean> {
-        const result = await  postCollection.updateOne({id: id}, {$set: {
+        // @ts-ignore
+        const result = await  postCollection.updateOne({_id: ObjectId(id)}, {$set: {
             title: body.title,
             shortDescription: body.shortDescription,
             content: body.content,
@@ -44,7 +50,8 @@ export const postsRepository = {
         return result.matchedCount === 1
     },
     async deletePost (id: string): Promise<boolean> {
-        const result = await  postCollection.deleteOne({id: id})
+        // @ts-ignore
+        const result = await  postCollection.deleteOne({_id: ObjectId(id)})
         return result.deletedCount === 1;
     }
 }

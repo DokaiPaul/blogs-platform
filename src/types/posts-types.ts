@@ -1,5 +1,6 @@
 export type PostsType = {
-    id: string,
+    id?: string,
+    _id?: string,
     title: string,
     shortDescription: string,
     content: string,

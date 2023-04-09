@@ -1,36 +1,40 @@
 import {BlogInputType, BlogsType} from "../types/blogs-types";
-import {blogs_db} from "../database/blogs-db";
-import {stat} from "fs";
 import {client} from "../database/mongo-db";
-import {PostsType} from "../types/posts-types";
+import {changeKeyName} from "../utils/object-operations";
+import {ObjectId} from "mongodb";
 
-export const blogsCollection = client.db('bloggers-platform').collection<BlogsType>('blogs')
+const blogsCollection = client.db('bloggers-platform').collection<BlogsType>('blogs')
 export const blogsRepository = {
-    async getAllBlogs (): Promise<BlogsType[]> {
-        const blogs = blogsCollection.find({}, {projection: {_id: 0}}).toArray();
+    async getAllBlogs (): Promise<BlogsType[] | undefined> {
+        const blogs = await blogsCollection.find({}).toArray();
+        blogs.forEach(b => changeKeyName(b, '_id','id'));
         return blogs;
     },
     async getBlogById (id: string): Promise<BlogsType | null> {
-        const blog = blogsCollection.findOne({id: id}, {projection: {_id: 0}})
+        // @ts-ignore
+        const blog = await blogsCollection.findOne({_id: ObjectId(id)})
+        if(!blog) {
+            return null;
+        }
+        changeKeyName(blog, '_id', 'id')
         return blog;
     },
     async createBlog (body: BlogInputType): Promise<BlogsType> {
         const newBlog = {
-            id: Date.now().toString(),
             name: body.name,
             description: body.description,
             websiteUrl: body.websiteUrl,
             createdAt: new Date().toISOString(),
             isMembership: false
         }
-        // @ts-ignore
-        const result = await blogsCollection.insertOne(newBlog)
-        // @ts-ignore
-        const {_id, ...blog} = newBlog;
-        return blog;
+
+        await blogsCollection.insertOne(newBlog)
+        changeKeyName(newBlog, '_id', 'id')
+        return newBlog;
     },
     async updateBlog (id: string , body:BlogInputType): Promise<boolean> {
-        const result = await blogsCollection.updateOne({id: id}, { $set: {
+        // @ts-ignore
+        const result = await blogsCollection.updateOne({_id: ObjectId(id)}, { $set: {
             name: body.name,
             description: body.description,
             websiteUrl: body.websiteUrl
@@ -39,7 +43,8 @@ export const blogsRepository = {
         return result.matchedCount === 1;
     },
     async deleteBlog (id: string): Promise<boolean> {
-        const result = await blogsCollection.deleteOne({id: id})
+        // @ts-ignore
+        const result = await blogsCollection.deleteOne({_id: ObjectId(id)})
 
         return result.deletedCount === 1
     }

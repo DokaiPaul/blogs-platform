@@ -1,7 +1,5 @@
 import {Request, Response, Router} from "express";
 import {videos_db} from "../database/videos_db";
-import {blogs_db} from "../database/blogs-db";
-import {posts_db} from "../database/posts-db";
 import {client} from "../database/mongo-db";
 import {PostsType} from "../types/posts-types";
 
