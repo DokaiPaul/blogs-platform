@@ -13,9 +13,9 @@ export const authorizationMiddleware = header('Authorization')
         const login = credentials[0];
         const pass = credentials[1];
 
-        const user = users.filter(u => u.login === login)
+        const user = users.find(u => u.login === login)
         if(user) {
-            if(user[0].password === pass) {
+            if(user.password === pass) {
                 return true;
             }
         }
