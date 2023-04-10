@@ -24,6 +24,10 @@ postsRouter.use(authorizationMiddleware);
 postsRouter.post('/',postBodyValidationMiddleware ,inputValidationMiddleware,
     async (req: Request, res: Response) => {
         const newPost = await postsRepository.createPost(req.body)
+        if(!newPost) {
+            res.sendStatus(400)
+            return
+        }
         res.status(201).json(newPost)
 })
 

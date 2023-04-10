@@ -21,8 +21,12 @@ export const postsRepository = {
         changeKeyName(post, '_id', 'id')
         return post;
     },
-    async createPost (body: PostsType): Promise<PostsType> {
-        const blog: BlogsType | null = await blogsCollection.findOne({_id: body.blogId});
+    async createPost (body: PostsType): Promise<PostsType | undefined> {
+        // @ts-ignore
+        const blog: BlogsType | null = await blogsCollection.findOne({_id: ObjectId(body.blogId)});
+        if(!blog?.name) {
+            return undefined;
+        }
 
         const newPost: PostsType = {
             title: body.title,
