@@ -26,8 +26,8 @@ blogsRouter.get('/:id', async (req: Request, res: Response) => {
     res.send(blog);
 })
 
-blogsRouter.use(authorizationMiddleware);
 blogsRouter.post('/' ,
+    authorizationMiddleware,
     requiredFieldsValidationMiddleware,
     bodyValidationMiddleware,
     inputValidationMiddleware,
@@ -39,6 +39,7 @@ blogsRouter.post('/' ,
 })
 
 blogsRouter.put('/:id',
+    authorizationMiddleware,
     requiredFieldsValidationMiddleware,
     bodyValidationMiddleware,
     inputValidationMiddleware,
@@ -54,6 +55,7 @@ blogsRouter.put('/:id',
 })
 
 blogsRouter.delete('/:id',
+    authorizationMiddleware,
     inputValidationMiddleware,
     async (req: Request, res: Response) => {
 

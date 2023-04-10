@@ -24,8 +24,8 @@ postsRouter.get('/:id', async (req: Request, res: Response) => {
     res.send(post);
 })
 
-postsRouter.use(authorizationMiddleware);
 postsRouter.post('/',
+    authorizationMiddleware,
     postBodyValidationMiddleware,
     inputValidationMiddleware,
     async (req: Request, res: Response) => {
@@ -40,6 +40,7 @@ postsRouter.post('/',
 })
 
 postsRouter.put('/:id',
+    authorizationMiddleware,
     postBodyValidationMiddleware,
     inputValidationMiddleware,
     async (req: Request, res: Response) => {
@@ -54,6 +55,7 @@ postsRouter.put('/:id',
 })
 
 postsRouter.delete('/:id',
+    authorizationMiddleware,
     inputValidationMiddleware,
     async (req: Request, res: Response) => {
 
