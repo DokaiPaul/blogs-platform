@@ -3,6 +3,7 @@ import {client} from "../database/mongo-db";
 import {BlogsType} from "../types/blogs-types";
 import {changeKeyName} from "../utils/object-operations";
 import {ObjectId} from "mongodb";
+import {errorMsg} from "../errors/errors";
 
 const postCollection = client.db('bloggers-platform').collection<PostsType>('posts')
 const blogsCollection = client.db('bloggers-platform').collection<BlogsType>('blogs')
@@ -22,20 +23,20 @@ export const postsRepository = {
         return post;
     },
     async createPost (body: PostsType): Promise<PostsType> {
-    const blogName = await blogsCollection.findOne({id: body.blogId})
-        const newPost = {
+        const blog: BlogsType | null = await blogsCollection.findOne({_id: body.blogId});
+
+        const newPost: PostsType = {
             title: body.title,
             shortDescription: body.shortDescription,
             content: body.content,
             blogId: body.blogId,
-            blogName: blogName?.name,
+            blogName: blog?.name,
             createdAt: new Date().toISOString(),
         }
 
-        // @ts-ignore
         await postCollection.insertOne(newPost)
         changeKeyName(newPost, '_id', 'id')
-        // @ts-ignore
+
         return newPost;
     },
     async updatePost (id: string, body: InputPostType): Promise<boolean> {
