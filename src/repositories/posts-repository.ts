@@ -3,7 +3,6 @@ import {client} from "../database/mongo-db";
 import {BlogsType} from "../types/blogs-types";
 import {changeKeyName} from "../utils/object-operations";
 import {ObjectId} from "mongodb";
-import {errorMsg} from "../errors/errors";
 
 const postCollection = client.db('bloggers-platform').collection<PostsType>('posts')
 const blogsCollection = client.db('bloggers-platform').collection<BlogsType>('blogs')
@@ -15,7 +14,7 @@ export const postsRepository = {
     },
     async getPostById (id: string): Promise<PostsType | null> {
         // @ts-ignore
-        const post = postCollection.findOne({_id: ObjectId(id)})
+        let post = await postCollection.findOne({_id: ObjectId(id)})
         if(!post) {
             return null;
         }
