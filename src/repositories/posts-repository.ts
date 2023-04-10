@@ -8,20 +8,25 @@ const postCollection = client.db('bloggers-platform').collection<PostsType>('pos
 const blogsCollection = client.db('bloggers-platform').collection<BlogsType>('blogs')
 export const postsRepository = {
     async getAllPosts (): Promise<PostsType[]> {
+
         const posts = await postCollection.find({}).toArray();
         posts.forEach(b => changeKeyName(b, '_id','id'));
+
         return posts;
     },
     async getPostById (id: string): Promise<PostsType | null> {
+
         // @ts-ignore
         let post = await postCollection.findOne({_id: ObjectId(id)})
         if(!post) {
             return null;
         }
         changeKeyName(post, '_id', 'id')
+
         return post;
     },
     async createPost (body: PostsType): Promise<PostsType | undefined> {
+
         // @ts-ignore
         const blog: BlogsType | null = await blogsCollection.findOne({_id: ObjectId(body.blogId)});
         if(!blog?.name) {
@@ -33,7 +38,7 @@ export const postsRepository = {
             shortDescription: body.shortDescription,
             content: body.content,
             blogId: body.blogId,
-            blogName: blog?.name,
+            blogName: blog.name,
             createdAt: new Date().toISOString(),
         }
 
@@ -43,6 +48,7 @@ export const postsRepository = {
         return newPost;
     },
     async updatePost (id: string, body: InputPostType): Promise<boolean> {
+
         // @ts-ignore
         const result = await  postCollection.updateOne({_id: ObjectId(id)}, {$set: {
             title: body.title,
@@ -54,8 +60,10 @@ export const postsRepository = {
         return result.matchedCount === 1
     },
     async deletePost (id: string): Promise<boolean> {
+
         // @ts-ignore
         const result = await  postCollection.deleteOne({_id: ObjectId(id)})
+
         return result.deletedCount === 1;
     }
 }
