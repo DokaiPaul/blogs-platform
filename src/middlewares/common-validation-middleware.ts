@@ -54,6 +54,9 @@ export const blogIdValidationMiddleware = body('blogId')
     .isString()
     .withMessage('Blog ID should be a string')
     .bail()
+    .isMongoId()
+    .withMessage('Id should be in mongo ID format')
+    .bail()
     .custom(async (value) => {
 
         if (!await blogsRepository.getBlogById(value)) {

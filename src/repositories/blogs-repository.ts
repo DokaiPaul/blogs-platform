@@ -14,8 +14,7 @@ export const blogsRepository = {
     },
     async getBlogById (id: string): Promise<BlogsType | null> {
 
-        // @ts-ignore
-        const blog = await blogsCollection.findOne({_id: ObjectId(id)})
+        const blog = await blogsCollection.findOne({_id: new ObjectId(id)})
         if(!blog) {
             return null;
         }
@@ -40,8 +39,7 @@ export const blogsRepository = {
     },
     async updateBlog (id: string , body:BlogInputType): Promise<boolean> {
 
-        // @ts-ignore
-        const result = await blogsCollection.updateOne({_id: ObjectId(id)}, { $set: {
+        const result = await blogsCollection.updateOne({_id: new ObjectId(id)}, { $set: {
             name: body.name,
             description: body.description,
             websiteUrl: body.websiteUrl
@@ -51,8 +49,7 @@ export const blogsRepository = {
     },
     async deleteBlog (id: string): Promise<boolean> {
 
-        // @ts-ignore
-        const result = await blogsCollection.deleteOne({_id: ObjectId(id)})
+        const result = await blogsCollection.deleteOne({_id: new ObjectId(id)})
 
         return result.deletedCount === 1
     }

@@ -45,13 +45,13 @@ postsRouter.put('/:id',
     inputValidationMiddleware,
     async (req: Request, res: Response) => {
 
-    let post = await postsRepository.updatePost(req.params.id ,req.body)
-    if(!post) {
-        res.sendStatus(404);
-        return;
-    }
+        let post = await postsRepository.updatePost(req.params.id ,req.body)
+        if(!post) {
+            res.sendStatus(404);
+            return;
+        }
 
-    res.sendStatus(204);
+        res.sendStatus(204);
 })
 
 postsRouter.delete('/:id',
@@ -59,11 +59,11 @@ postsRouter.delete('/:id',
     inputValidationMiddleware,
     async (req: Request, res: Response) => {
 
-    const result = await postsRepository.deletePost(req.params.id)
-    if(!result) {
-        res.sendStatus(404);
-        return;
-    }
+        const result = await postsRepository.deletePost(req.params.id)
+        if(!result) {
+            res.sendStatus(404);
+            return;
+        }
 
-    res.sendStatus(204);
+        res.sendStatus(204);
 })

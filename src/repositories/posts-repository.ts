@@ -16,8 +16,7 @@ export const postsRepository = {
     },
     async getPostById (id: string): Promise<PostsType | null> {
 
-        // @ts-ignore
-        let post = await postCollection.findOne({_id: ObjectId(id)})
+        let post = await postCollection.findOne({_id: new ObjectId(id)})
         if(!post) {
             return null;
         }
@@ -25,20 +24,16 @@ export const postsRepository = {
 
         return post;
     },
-    async createPost (body: PostsType): Promise<PostsType | undefined> {
+    async createPost (body: PostsType): Promise<PostsType> {
 
-        // @ts-ignore
-        const blog: BlogsType | null = await blogsCollection.findOne({_id: ObjectId(body.blogId)});
-        if(!blog?.name) {
-            return undefined;
-        }
+        const blog: BlogsType | null = await blogsCollection.findOne({_id: new ObjectId(body.blogId)});
 
         const newPost: PostsType = {
             title: body.title,
             shortDescription: body.shortDescription,
             content: body.content,
             blogId: body.blogId,
-            blogName: blog.name,
+            blogName: blog!.name,
             createdAt: new Date().toISOString(),
         }
 
@@ -49,8 +44,7 @@ export const postsRepository = {
     },
     async updatePost (id: string, body: InputPostType): Promise<boolean> {
 
-        // @ts-ignore
-        const result = await  postCollection.updateOne({_id: ObjectId(id)}, {$set: {
+        const result = await  postCollection.updateOne({_id: new ObjectId(id)}, {$set: {
             title: body.title,
             shortDescription: body.shortDescription,
             content: body.content,
@@ -61,8 +55,7 @@ export const postsRepository = {
     },
     async deletePost (id: string): Promise<boolean> {
 
-        // @ts-ignore
-        const result = await  postCollection.deleteOne({_id: ObjectId(id)})
+        const result = await  postCollection.deleteOne({_id: new ObjectId(id)})
 
         return result.deletedCount === 1;
     }
