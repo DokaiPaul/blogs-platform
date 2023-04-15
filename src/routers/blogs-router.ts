@@ -5,18 +5,24 @@ import {authorizationMiddleware} from "../middlewares/authorization-middleware";
 import {param} from "express-validator";
 import {blogsService} from "../domain/blogs-service";
 import {postsService} from "../domain/posts-service";
+import {RequestWithParamsAndQuery} from "../types/request-types";
+import {QueryBlogsModel} from "../models/query-models/query-blogs-model";
+import {blogsQueryRepository} from "../query-repositories/blogs-query-repository";
+import {QueryPostsModel} from "../models/query-models/query-posts-model";
+import {postsQueryRepository} from "../query-repositories/posts-query-repository";
 
 export const blogsRouter = Router({})
 
 
 
-blogsRouter.get('/', async (req: Request, res: Response) => {
+blogsRouter.get('/', async (req: RequestWithParamsAndQuery<{id: string},QueryBlogsModel>, res: Response) => {
 
-    const blogs = await blogsService.findAllBlogs();
+    const blogs = await blogsQueryRepository.findBlogs(req);
     res.send(blogs);
 })
 
-blogsRouter.get('/:id', param('id').isMongoId(), checkErrors, async (req: Request, res: Response) => {
+blogsRouter.get('/:id', param('id').isMongoId(), checkErrors,
+    async (req: Request, res: Response) => {
 
     const blog = await blogsService.findBlogById(req.params.id);
     if(!blog) {
@@ -27,8 +33,10 @@ blogsRouter.get('/:id', param('id').isMongoId(), checkErrors, async (req: Reques
     res.send(blog);
 })
 
-blogsRouter.get('/:id/posts', param('id').isMongoId(), checkErrors, async (req: Request, res: Response) => {
-    const blogs = await postsService.findPostsInBlog(req.params.id);
+blogsRouter.get('/:id/posts', param('id').isMongoId(), checkErrors,
+    async (req: RequestWithParamsAndQuery<{id: string}, QueryPostsModel>, res: Response) => {
+
+    const blogs = await postsQueryRepository.findPostsInBlog(req);
 
     if(!blogs) {
         res.sendStatus(404);

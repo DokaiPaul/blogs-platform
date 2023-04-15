@@ -1,7 +1,7 @@
-import {supportedResolutions} from "../database/videos_db";
-import {ErrorMessages} from "../types/errors-types";
-import {VideoType} from "../types/videos-types";
-import {errorMsg} from "../utils/errors/errors";
+import {supportedResolutions} from "../../database/videos_db";
+import {ErrorMessages} from "../../types/errors-types";
+import {VideoType} from "../../types/videos-types";
+import {errorMsg} from "../errors/errors";
 
 export const postRequestValidate = (body: VideoType) => {
     const errorsArr: ErrorMessages = {

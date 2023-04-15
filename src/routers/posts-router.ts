@@ -4,13 +4,15 @@ import {checkErrors} from "../middlewares/check-errors";
 import {postBodyValidationMiddleware} from "../middlewares/body-validation-middleware";
 import {param} from "express-validator";
 import {postsService} from "../domain/posts-service";
+import {postsQueryRepository} from "../query-repositories/posts-query-repository";
+import {RequestWithQuery} from "../types/request-types";
+import {QueryPostsModel} from "../models/query-models/query-posts-model";
 
 export const postsRouter = Router({});
 
-postsRouter.get('/', async (req: Request, res: Response) => {
+postsRouter.get('/', async (req: RequestWithQuery<QueryPostsModel>, res: Response) => {
 
-    const posts = await postsService.findAllPosts()
-
+    const posts = await postsQueryRepository.findPosts(req);
     res.send(posts);
 })
 

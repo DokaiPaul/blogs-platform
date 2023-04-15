@@ -1,8 +1,8 @@
 import {Request, Response, Router} from "express";
 import {videos_db} from "../database/videos_db";
-import {postRequestValidate} from "../validation/post-request-validation";
+import {postRequestValidate} from "../utils/validation/post-request-validation";
 import {VideoType} from "../types/videos-types";
-import {putRequestValidate} from "../validation/put-request-validation";
+import {putRequestValidate} from "../utils/validation/put-request-validation";
 
 
 export const videosRouter = Router({})
