@@ -1,9 +1,10 @@
-import {InputPostType, PostsType} from "../types/posts-types";
+import {PostInputType, PostsType} from "../types/posts-types";
 import {client} from "../database/mongo-db";
 import {BlogsType} from "../types/blogs-types";
 import {changeKeyName} from "../utils/object-operations";
 import {ObjectId} from "mongodb";
 import {postsRepository} from "../repositories/posts-repository";
+import {blogsService} from "./blogs-service";
 
 const blogsCollection = client.db('bloggers-platform').collection<BlogsType>('blogs')
 export const postsService = {
@@ -14,6 +15,13 @@ export const postsService = {
         posts.forEach(b => changeKeyName(b, '_id','id'));
 
         return posts;
+    },
+    async findPostsInBlog (id: string): Promise<PostsType[] | null | undefined> {
+        const blog = await blogsService.findBlogById(id);
+
+        if(!blog) return null
+
+        return await postsRepository.findPostsInBlog(id)
     },
     async findPostById (id: string): Promise<PostsType | null> {
 
@@ -41,7 +49,7 @@ export const postsService = {
 
         return newPost;
     },
-    async updatePost (id: string, body: InputPostType): Promise<boolean> {
+    async updatePost (id: string, body: PostInputType): Promise<boolean> {
 
         const result = await postsRepository.updatePost(id, body);
 

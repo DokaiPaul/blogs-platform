@@ -6,12 +6,12 @@ export type PostsType = {
     title: string,
     shortDescription: string,
     content: string,
-    blogId: string,
-    blogName: string | undefined,
+    blogId: ObjectId | string,
+    blogName: string,
     createdAt: string
 }
 
-export type InputPostType = {
+export type PostInputType = {
     title: string,
     shortDescription: string,
     content: string,

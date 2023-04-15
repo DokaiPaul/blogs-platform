@@ -14,7 +14,7 @@ postsRouter.get('/', async (req: Request, res: Response) => {
     res.send(posts);
 })
 
-postsRouter.get('/:id', param('id').isMongoId(), async (req: Request, res: Response) => {
+postsRouter.get('/:id', param('id').isMongoId(), checkErrors, async (req: Request, res: Response) => {
 
     const post = await postsService.findPostById(req.params.id);
     if(!post) {

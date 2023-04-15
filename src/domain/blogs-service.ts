@@ -1,6 +1,8 @@
 import {BlogInputType, BlogsType} from "../types/blogs-types";
 import {changeKeyName} from "../utils/object-operations";
 import {blogsRepository} from "../repositories/blogs-repository";
+import {PostInputType, PostsType} from "../types/posts-types";
+import {postsRepository} from "../repositories/posts-repository";
 
 export const blogsService = {
     async findAllBlogs (): Promise<BlogsType[] | {}> {
@@ -34,6 +36,25 @@ export const blogsService = {
         changeKeyName(newBlog, '_id', 'id')
 
         return newBlog;
+    },
+    async createPost (id: string, body: PostInputType): Promise<PostsType | null> {
+
+        const blog = await blogsRepository.findBlogById(id);
+
+        if(!blog) return null;
+
+        const newPost: PostsType = {
+            title: body.title,
+            shortDescription: body.shortDescription,
+            content: body.content,
+            blogId: id,
+            blogName: blog.name,
+            createdAt: new Date().toISOString(),
+        }
+
+        await postsRepository.createPost(newPost)
+        changeKeyName(newPost, '_id', 'id')
+        return newPost;
     },
     async updateBlog (id: string , body:BlogInputType): Promise<boolean> {
 

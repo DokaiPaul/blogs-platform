@@ -2,7 +2,9 @@ import {body} from "express-validator";
 import {blogsRepository} from "../repositories/blogs-repository";
 
 export const nameValidationMiddleware = body('name')
-    .if(body('name').notEmpty())
+    .notEmpty()
+    .withMessage('Name field should be not empty')
+    .bail()
     .isString()
     .withMessage('Name should be a string')
     .bail()
@@ -10,7 +12,9 @@ export const nameValidationMiddleware = body('name')
     .withMessage('Your name should be not empty or longer than 15 symbols');
 
 export const descriptionValidationMiddleware = body('description')
-    .if(body('description').notEmpty())
+    .notEmpty()
+    .withMessage('Description should be not empty')
+    .bail()
     .isString()
     .withMessage('Description should be a string')
     .bail()
@@ -18,7 +22,9 @@ export const descriptionValidationMiddleware = body('description')
     .withMessage('Your description should be not empty or longer than 500 symbols');
 
 export const websiteUrlValidationMiddleware = body('websiteUrl')
-    .if(body('websiteUrl').notEmpty())
+    .notEmpty()
+    .withMessage('Web site field should be not empty')
+    .bail()
     .isString()
     .withMessage('Website URL should be a string')
     .bail()

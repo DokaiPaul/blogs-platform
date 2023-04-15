@@ -1,4 +1,4 @@
-import {InputPostType, PostsType} from "../types/posts-types";
+import {PostInputType, PostsType} from "../types/posts-types";
 import {client} from "../database/mongo-db";
 import {ObjectId} from "mongodb";
 import {DeletedObject, InsertedObject, UpdatedObject} from "../types/mongo-db-types";
@@ -9,6 +9,10 @@ export const postsRepository = {
 
         return await postCollection.find({}).toArray();
     },
+    async findPostsInBlog (id: string): Promise<PostsType[] | null | undefined>{
+
+        return await postCollection.find({blogId: id}).toArray()
+    },
     async findPostById (id: string): Promise<PostsType | null | undefined> {
 
         return await postCollection.findOne({_id: new ObjectId(id)});
@@ -17,7 +21,7 @@ export const postsRepository = {
 
         return await postCollection.insertOne(post);
     },
-    async updatePost (id: string, body: InputPostType): Promise<UpdatedObject> {
+    async updatePost (id: string, body: PostInputType): Promise<UpdatedObject> {
 
         return await postCollection.updateOne({_id: new ObjectId(id)}, {$set: {
             title: body.title,
