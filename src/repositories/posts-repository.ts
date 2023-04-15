@@ -44,7 +44,7 @@ export const postsRepository = {
     },
     async updatePost (id: string, body: InputPostType): Promise<boolean> {
 
-        const result = await  postCollection.updateOne({_id: new ObjectId(id)}, {$set: {
+        const result = await postCollection.updateOne({_id: new ObjectId(id)}, {$set: {
             title: body.title,
             shortDescription: body.shortDescription,
             content: body.content,

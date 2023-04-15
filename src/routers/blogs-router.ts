@@ -4,6 +4,7 @@ import {blogsRepository} from "../repositories/blogs-repository";
 import {inputValidationMiddleware} from "../middlewares/input-validation-middleware";
 import {requiredFieldsValidationMiddleware} from "../middlewares/required-fields-validation-middleware";
 import {authorizationMiddleware} from "../middlewares/authorization-middleware";
+import {param} from "express-validator";
 
 export const blogsRouter = Router({})
 
@@ -15,7 +16,7 @@ blogsRouter.get('/', async (req: Request, res: Response) => {
     res.send(blogs);
 })
 
-blogsRouter.get('/:id', async (req: Request, res: Response) => {
+blogsRouter.get('/:id', param('id').isMongoId(), async (req: Request, res: Response) => {
 
     const blog = await blogsRepository.getBlogById(req.params.id);
     if(!blog) {
@@ -39,6 +40,7 @@ blogsRouter.post('/' ,
 })
 
 blogsRouter.put('/:id',
+    param('id').isMongoId(),
     authorizationMiddleware,
     requiredFieldsValidationMiddleware,
     bodyValidationMiddleware,
@@ -55,6 +57,7 @@ blogsRouter.put('/:id',
 })
 
 blogsRouter.delete('/:id',
+    param('id').isMongoId(),
     authorizationMiddleware,
     inputValidationMiddleware,
     async (req: Request, res: Response) => {

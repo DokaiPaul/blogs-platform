@@ -212,7 +212,7 @@ describe('/posts', () => {
                 blogId: blog.id + 'random124',
             })
             .expect(400, {errorsMessages: [{
-                    message: 'This blogs ID does not exists',
+                    message: 'Id should be in mongo ID format',
                     field: 'blogId'
                 }]})
 
@@ -239,7 +239,8 @@ describe('/posts', () => {
             shortDescription: 'created by e2e tests',
             content: 'blablabla',
             blogId: blog.id,
-            blogName: post.blogName
+            blogName: post.blogName,
+            createdAt: post.createdAt
         })
 
         const get = await request(app).get('/posts').expect(200)
@@ -248,7 +249,7 @@ describe('/posts', () => {
     });
 
     it(`shouldn't update post without authorization`, async () => {
-        const response = await request(app)
+        await request(app)
             .put('/posts/'+post.id)
             .send({
                 title: 'updated post',
@@ -264,7 +265,7 @@ describe('/posts', () => {
     });
 
     it(`shouldn't update post by incorrect id`, async () => {
-        const response = await request(app)
+        await request(app)
             .put('/posts/'+post.id+'random')
             .set('authorization', 'Basic YWRtaW46cXdlcnR5')
             .send({
@@ -273,7 +274,7 @@ describe('/posts', () => {
                 content: 'blablabla',
                 blogId: blog.id
             })
-            .expect(404)
+            .expect(400)
 
         const get = await request(app).get('/posts').expect(200)
 
@@ -281,7 +282,7 @@ describe('/posts', () => {
     });
 
     it(`should update post with correct data`, async () => {
-        const response = await request(app)
+        await request(app)
             .put('/posts/'+post.id)
             .set('authorization', 'Basic YWRtaW46cXdlcnR5')
             .send({
@@ -300,7 +301,8 @@ describe('/posts', () => {
             shortDescription: 'updated by e2e tests',
             content: 'blablabla',
             blogId: blog.id,
-            blogName: 'Jest tests'
+            blogName: 'Jest tests',
+            createdAt: post.createdAt
         })
     });
 
@@ -318,7 +320,7 @@ describe('/posts', () => {
         await request(app)
             .delete('/posts/'+post.id+'random')
             .set('authorization', 'Basic YWRtaW46cXdlcnR5')
-            .expect(404)
+            .expect(400)
 
         const get = await request(app).get('/posts').expect(200)
 

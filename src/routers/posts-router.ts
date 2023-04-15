@@ -3,6 +3,7 @@ import {authorizationMiddleware} from "../middlewares/authorization-middleware";
 import {inputValidationMiddleware} from "../middlewares/input-validation-middleware";
 import {postBodyValidationMiddleware} from "../middlewares/body-validation-middleware";
 import {postsRepository} from "../repositories/posts-repository";
+import {param} from "express-validator";
 
 export const postsRouter = Router({});
 
@@ -13,7 +14,7 @@ postsRouter.get('/', async (req: Request, res: Response) => {
     res.send(posts);
 })
 
-postsRouter.get('/:id', async (req: Request, res: Response) => {
+postsRouter.get('/:id', param('id').isMongoId(), async (req: Request, res: Response) => {
 
     const post = await postsRepository.getPostById(req.params.id);
     if(!post) {
@@ -40,6 +41,7 @@ postsRouter.post('/',
 })
 
 postsRouter.put('/:id',
+    param('id').isMongoId(),
     authorizationMiddleware,
     postBodyValidationMiddleware,
     inputValidationMiddleware,
@@ -55,6 +57,7 @@ postsRouter.put('/:id',
 })
 
 postsRouter.delete('/:id',
+    param('id').isMongoId(),
     authorizationMiddleware,
     inputValidationMiddleware,
     async (req: Request, res: Response) => {
