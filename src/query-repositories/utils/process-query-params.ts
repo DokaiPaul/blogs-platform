@@ -8,7 +8,7 @@ export const parseBlogsQuery = (req: QueryBlogsModel) => {
     req.sortBy ? sortBy = req.sortBy : sortBy = 'createdAt';
     req.sortDirection ? sortDir = req.sortDirection : sortDir = 'desc';
     req.pageNumber ? pageNum = +req.pageNumber : pageNum = 1;
-    req.pageSize ? pageSize = +req.pageSize : pageSize = 20;
+    req.pageSize ? pageSize = +req.pageSize : pageSize = 10;
 
     const output: [string | null, string, string, number, number] = [searchByTerm, sortBy, sortDir, pageNum, pageSize]
     return output
