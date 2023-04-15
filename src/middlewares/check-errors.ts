@@ -3,7 +3,7 @@ import {validationResult} from "express-validator";
 import {errorMsg} from "../utils/errors/errors";
 import {ErrorMessages} from "../types/errors-types";
 
-export const inputValidationMiddleware = (req: Request, res: Response, next: NextFunction) => {
+export const checkErrors = (req: Request, res: Response, next: NextFunction) => {
     const errorsArr: ErrorMessages = {
         "errorsMessages": []
     };

@@ -1,5 +1,4 @@
 import {body} from "express-validator";
-import {blogs_db} from "../database/blogs-db";
 import {blogsRepository} from "../repositories/blogs-repository";
 
 export const nameValidationMiddleware = body('name')
@@ -59,7 +58,7 @@ export const blogIdValidationMiddleware = body('blogId')
     .bail()
     .custom(async (value) => {
 
-        if (!await blogsRepository.getBlogById(value)) {
+        if (!await blogsRepository.findBlogById(value)) {
             throw new Error('This blogs ID does not exists')
         }
         return true;

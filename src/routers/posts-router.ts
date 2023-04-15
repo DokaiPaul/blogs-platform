@@ -1,22 +1,22 @@
 import {Router, Response, Request} from "express";
 import {authorizationMiddleware} from "../middlewares/authorization-middleware";
-import {inputValidationMiddleware} from "../middlewares/input-validation-middleware";
+import {checkErrors} from "../middlewares/check-errors";
 import {postBodyValidationMiddleware} from "../middlewares/body-validation-middleware";
-import {postsRepository} from "../repositories/posts-repository";
 import {param} from "express-validator";
+import {postsService} from "../domain/posts-service";
 
 export const postsRouter = Router({});
 
 postsRouter.get('/', async (req: Request, res: Response) => {
 
-    const posts = await postsRepository.getAllPosts()
+    const posts = await postsService.findAllPosts()
 
     res.send(posts);
 })
 
 postsRouter.get('/:id', param('id').isMongoId(), async (req: Request, res: Response) => {
 
-    const post = await postsRepository.getPostById(req.params.id);
+    const post = await postsService.findPostById(req.params.id);
     if(!post) {
         res.sendStatus(404);
         return;
@@ -28,10 +28,10 @@ postsRouter.get('/:id', param('id').isMongoId(), async (req: Request, res: Respo
 postsRouter.post('/',
     authorizationMiddleware,
     postBodyValidationMiddleware,
-    inputValidationMiddleware,
+    checkErrors,
     async (req: Request, res: Response) => {
 
-        const newPost = await postsRepository.createPost(req.body)
+        const newPost = await postsService.createPost(req.body)
         if(!newPost) {
             res.sendStatus(400)
             return
@@ -44,10 +44,10 @@ postsRouter.put('/:id',
     param('id').isMongoId(),
     authorizationMiddleware,
     postBodyValidationMiddleware,
-    inputValidationMiddleware,
+    checkErrors,
     async (req: Request, res: Response) => {
 
-        let post = await postsRepository.updatePost(req.params.id ,req.body)
+        let post = await postsService.updatePost(req.params.id ,req.body)
         if(!post) {
             res.sendStatus(404);
             return;
@@ -59,10 +59,10 @@ postsRouter.put('/:id',
 postsRouter.delete('/:id',
     param('id').isMongoId(),
     authorizationMiddleware,
-    inputValidationMiddleware,
+    checkErrors,
     async (req: Request, res: Response) => {
 
-        const result = await postsRepository.deletePost(req.params.id)
+        const result = await postsService.deletePostById(req.params.id)
         if(!result) {
             res.sendStatus(404);
             return;

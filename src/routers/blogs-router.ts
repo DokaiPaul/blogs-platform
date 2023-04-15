@@ -1,10 +1,10 @@
 import {Request, Response, Router} from "express";
 import {bodyValidationMiddleware} from "../middlewares/body-validation-middleware";
-import {blogsRepository} from "../repositories/blogs-repository";
-import {inputValidationMiddleware} from "../middlewares/input-validation-middleware";
+import {checkErrors} from "../middlewares/check-errors";
 import {requiredFieldsValidationMiddleware} from "../middlewares/required-fields-validation-middleware";
 import {authorizationMiddleware} from "../middlewares/authorization-middleware";
 import {param} from "express-validator";
+import {blogsService} from "../domain/blogs-service";
 
 export const blogsRouter = Router({})
 
@@ -12,13 +12,13 @@ export const blogsRouter = Router({})
 
 blogsRouter.get('/', async (req: Request, res: Response) => {
 
-    const blogs = await blogsRepository.getAllBlogs();
+    const blogs = await blogsService.findAllBlogs();
     res.send(blogs);
 })
 
 blogsRouter.get('/:id', param('id').isMongoId(), async (req: Request, res: Response) => {
 
-    const blog = await blogsRepository.getBlogById(req.params.id);
+    const blog = await blogsService.findBlogById(req.params.id);
     if(!blog) {
         res.sendStatus(404);
         return;
@@ -27,16 +27,30 @@ blogsRouter.get('/:id', param('id').isMongoId(), async (req: Request, res: Respo
     res.send(blog);
 })
 
+blogsRouter.get('/:id/posts', param('id').isMongoId(), async (req: Request, res: Response) => {
+
+})
+
 blogsRouter.post('/' ,
     authorizationMiddleware,
     requiredFieldsValidationMiddleware,
     bodyValidationMiddleware,
-    inputValidationMiddleware,
+    checkErrors,
     async (req: Request, res: Response) => {
 
-        const newBlog = await blogsRepository.createBlog(req.body)
+        const newBlog = await blogsService.createBlog(req.body)
 
         res.status(201).json(newBlog);
+})
+
+blogsRouter.post('/:id/posts',
+    param('id').isMongoId(),
+    authorizationMiddleware,
+    requiredFieldsValidationMiddleware,
+    bodyValidationMiddleware,
+    checkErrors,
+    async (req: Request, res: Response) => {
+
 })
 
 blogsRouter.put('/:id',
@@ -44,10 +58,10 @@ blogsRouter.put('/:id',
     authorizationMiddleware,
     requiredFieldsValidationMiddleware,
     bodyValidationMiddleware,
-    inputValidationMiddleware,
+    checkErrors,
     async (req: Request, res: Response) => {
 
-        const blog = await blogsRepository.updateBlog(req.params.id ,req.body)
+        const blog = await blogsService.updateBlog(req.params.id ,req.body)
         if(!blog) {
             res.sendStatus(404);
             return;
@@ -59,10 +73,10 @@ blogsRouter.put('/:id',
 blogsRouter.delete('/:id',
     param('id').isMongoId(),
     authorizationMiddleware,
-    inputValidationMiddleware,
+    checkErrors,
     async (req: Request, res: Response) => {
 
-        const result = await blogsRepository.deleteBlog(req.params.id)
+        const result = await blogsService.deleteBlog(req.params.id)
         if(!result) {
             res.sendStatus(404);
             return;
