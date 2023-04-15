@@ -23,7 +23,19 @@ export const postsQueryRepository = {
             .toArray();
 
         posts.forEach(p => changeKeyName(p, '_id','id'))
-        return posts;
+
+        const totalMatchedPosts = await postCollection.find(filter).count()
+        const totalPages = Math.ceil(totalMatchedPosts / pageSize)
+
+        const paginator = {
+            pagesCount: totalPages,
+            page: pageNum,
+            pageSize: pageSize,
+            totalCount: totalMatchedPosts,
+            items: posts
+        }
+        // @ts-ignore
+        return paginator;
     },
     async findPostsInBlog (req: RequestWithParamsAndQuery<{id: string}, QueryPostsModel>): Promise<PostsType[] | null | undefined>{
         const [sortBy, sortDir, pageNum, pageSize] = parsePostsQuery(req.query);
@@ -39,8 +51,20 @@ export const postsQueryRepository = {
             .skip((pageNum - 1) * pageSize)
             .toArray();
 
+        if(posts.length < 1) return null;
         posts.forEach(p => changeKeyName(p, '_id','id'))
 
-        return posts;
+        const totalMatchedPosts = await postCollection.find({blogId: req.params.id}).count()
+        const totalPages = Math.ceil(totalMatchedPosts / pageSize)
+
+        const paginator = {
+            pagesCount: totalPages,
+            page: pageNum,
+            pageSize: pageSize,
+            totalCount: totalMatchedPosts,
+            items: posts
+        }
+        // @ts-ignore
+        return paginator;
     }
 }

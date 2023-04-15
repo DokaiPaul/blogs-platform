@@ -26,6 +26,18 @@ export const blogsQueryRepository = {
             .toArray();
 
         blogs.forEach(b => changeKeyName(b, '_id', 'id'))
-        return blogs;
+
+        const totalMatchedPosts = await blogsCollection.find(filter).count()
+        const totalPages = Math.ceil(totalMatchedPosts / pageSize)
+
+        const paginator = {
+            pagesCount: totalPages,
+            page: pageNum,
+            pageSize: pageSize,
+            totalCount: totalMatchedPosts,
+            items: blogs
+        }
+        // @ts-ignore
+        return paginator;
     }
 }
