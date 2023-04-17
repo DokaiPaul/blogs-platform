@@ -3,6 +3,9 @@ import {users} from "../database/users-db";
 import {decodeBase64} from "../utils/decoders";
 
 export const authorizationMiddleware = header('Authorization')
+    .notEmpty()
+    .withMessage('You do not have permissions to perform this action')
+    .bail()
     .custom(value => {
         const values: string[] = value.split(' ');
         const credentials = decodeBase64(values[1]);

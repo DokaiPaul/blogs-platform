@@ -3,12 +3,13 @@ import request from "supertest";
 import {app} from "../src/settings";
 import {BlogsType} from "../src/models/view-models/blogs-view-model";
 import {PostsType} from "../src/models/view-models/posts-view-model";
+import {client} from "../src/database/mongo-db";
 
 
-describe('/posts', () => {
+describe('/posts', async () => {
     let blog: BlogsType;
     let post: PostsType;
-    beforeAll(async  () => {
+    beforeAll(async () => {
         await request(app).delete('/testing/all-data').expect(204);
         const responce = await request(app)
             .post('/blogs')
@@ -22,7 +23,7 @@ describe('/posts', () => {
     });
 
     it('GET all posts', async () => {
-        await request(app).get('/posts').expect(200, { pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: [] })
+        await request(app).get('/posts').expect(200, {pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: []})
     });
 
     //add tests after API development is done
@@ -37,7 +38,7 @@ describe('/posts', () => {
             })
             .expect(401)
 
-        await request(app).get('/posts').expect(200, { pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: [] })
+        await request(app).get('/posts').expect(200, {pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: []})
     });
 
     it(`shouldn't create post with title that is not string`, async () => {
@@ -50,12 +51,14 @@ describe('/posts', () => {
                 content: 'longread about anythibg',
                 blogId: blog.id,
             })
-            .expect(400, {errorsMessages: [{
+            .expect(400, {
+                errorsMessages: [{
                     message: 'Title should be a string',
                     field: 'title'
-                }]})
+                }]
+            })
 
-        await request(app).get('/posts').expect(200, { pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: [] })
+        await request(app).get('/posts').expect(200, {pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: []})
     });
 
     it(`shouldn't create post with empty title`, async () => {
@@ -68,12 +71,14 @@ describe('/posts', () => {
                 content: 'longread about anythibg',
                 blogId: blog.id,
             })
-            .expect(400, {errorsMessages: [{
+            .expect(400, {
+                errorsMessages: [{
                     message: 'Title should be not longer than 30 symbols',
                     field: 'title'
-                }]})
+                }]
+            })
 
-        await request(app).get('/posts').expect(200, { pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: [] })
+        await request(app).get('/posts').expect(200, {pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: []})
     });
 
     it(`shouldn't create post with title that longer than 30 symbols`, async () => {
@@ -86,12 +91,14 @@ describe('/posts', () => {
                 content: 'longread about anythibg',
                 blogId: blog.id,
             })
-            .expect(400, {errorsMessages: [{
+            .expect(400, {
+                errorsMessages: [{
                     message: 'Title should be not longer than 30 symbols',
                     field: 'title'
-                }]})
+                }]
+            })
 
-        await request(app).get('/posts').expect(200, { pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: [] })
+        await request(app).get('/posts').expect(200, {pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: []})
     });
 
     it(`shouldn't create post with shortDecription that is not a string`, async () => {
@@ -104,12 +111,14 @@ describe('/posts', () => {
                 content: 'longread about anythibg',
                 blogId: blog.id,
             })
-            .expect(400, {errorsMessages: [{
+            .expect(400, {
+                errorsMessages: [{
                     message: 'Description should be a string',
                     field: 'shortDescription'
-                }]})
+                }]
+            })
 
-        await request(app).get('/posts').expect(200, { pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: [] })
+        await request(app).get('/posts').expect(200, {pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: []})
     });
 
     it(`shouldn't create post with empty shortDecription`, async () => {
@@ -122,12 +131,14 @@ describe('/posts', () => {
                 content: 'longread about anythibg',
                 blogId: blog.id,
             })
-            .expect(400, {errorsMessages: [{
+            .expect(400, {
+                errorsMessages: [{
                     message: 'Description should be not longer than 100 symbols',
                     field: 'shortDescription'
-                }]})
+                }]
+            })
 
-        await request(app).get('/posts').expect(200, { pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: [] })
+        await request(app).get('/posts').expect(200, {pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: []})
     });
 
     it(`shouldn't create post with shortDecription that is longer than 100 symbols`, async () => {
@@ -140,12 +151,14 @@ describe('/posts', () => {
                 content: 'longread about anythibg',
                 blogId: blog.id,
             })
-            .expect(400, {errorsMessages: [{
+            .expect(400, {
+                errorsMessages: [{
                     message: 'Description should be not longer than 100 symbols',
                     field: 'shortDescription'
-                }]})
+                }]
+            })
 
-        await request(app).get('/posts').expect(200, { pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: [] })
+        await request(app).get('/posts').expect(200, {pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: []})
     });
 
     it(`shouldn't create post if content is not a string`, async () => {
@@ -158,12 +171,14 @@ describe('/posts', () => {
                 content: [],
                 blogId: blog.id,
             })
-            .expect(400, {errorsMessages: [{
+            .expect(400, {
+                errorsMessages: [{
                     message: 'Content should be a string',
                     field: 'content'
-                }]})
+                }]
+            })
 
-        await request(app).get('/posts').expect(200, { pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: [] })
+        await request(app).get('/posts').expect(200, {pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: []})
     });
 
     it(`shouldn't create post with empty content`, async () => {
@@ -176,12 +191,14 @@ describe('/posts', () => {
                 content: '    ',
                 blogId: blog.id,
             })
-            .expect(400, {errorsMessages: [{
+            .expect(400, {
+                errorsMessages: [{
                     message: 'Content should be not longer than 1000 symbols',
                     field: 'content'
-                }]})
+                }]
+            })
 
-        await request(app).get('/posts').expect(200, { pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: [] })
+        await request(app).get('/posts').expect(200, {pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: []})
     });
 
     it(`shouldn't create post if blogId is not string`, async () => {
@@ -194,12 +211,14 @@ describe('/posts', () => {
                 content: 'blablabla',
                 blogId: 21458,
             })
-            .expect(400, {errorsMessages: [{
+            .expect(400, {
+                errorsMessages: [{
                     message: 'Blog ID should be a string',
                     field: 'blogId'
-                }]})
+                }]
+            })
 
-        await request(app).get('/posts').expect(200, { pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: [] })
+        await request(app).get('/posts').expect(200, {pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: []})
     });
 
     it(`shouldn't create post if blogId doesn't exist in blogs_db`, async () => {
@@ -212,12 +231,14 @@ describe('/posts', () => {
                 content: 'blablabla',
                 blogId: blog.id + 'random124',
             })
-            .expect(400, {errorsMessages: [{
+            .expect(400, {
+                errorsMessages: [{
                     message: 'Id should be in mongo ID format',
                     field: 'blogId'
-                }]})
+                }]
+            })
 
-        await request(app).get('/posts').expect(200, { pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: [] })
+        await request(app).get('/posts').expect(200, {pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: []})
     });
 
     it(`should create post with correct data`, async () => {
@@ -251,7 +272,7 @@ describe('/posts', () => {
 
     it(`shouldn't update post without authorization`, async () => {
         await request(app)
-            .put('/posts/'+post.id)
+            .put('/posts/' + post.id)
             .send({
                 title: 'updated post',
                 shortDescription: 'updated by e2e tests',
@@ -267,7 +288,7 @@ describe('/posts', () => {
 
     it(`shouldn't update post by incorrect id`, async () => {
         await request(app)
-            .put('/posts/'+post.id+'random')
+            .put('/posts/' + post.id + 'random')
             .set('authorization', 'Basic YWRtaW46cXdlcnR5')
             .send({
                 title: 'updated post',
@@ -284,7 +305,7 @@ describe('/posts', () => {
 
     it(`should update post with correct data`, async () => {
         await request(app)
-            .put('/posts/'+post.id)
+            .put('/posts/' + post.id)
             .set('authorization', 'Basic YWRtaW46cXdlcnR5')
             .send({
                 title: 'updated post',
@@ -309,7 +330,7 @@ describe('/posts', () => {
 
     it(`shouldn't delete without authorization`, async () => {
         await request(app)
-            .delete('/posts/'+post.id)
+            .delete('/posts/' + post.id)
             .expect(401)
 
         const get = await request(app).get('/posts').expect(200)
@@ -319,7 +340,7 @@ describe('/posts', () => {
 
     it(`shouldn't delete by incorrect id`, async () => {
         await request(app)
-            .delete('/posts/'+post.id+'random')
+            .delete('/posts/' + post.id + 'random')
             .set('authorization', 'Basic YWRtaW46cXdlcnR5')
             .expect(400)
 
@@ -330,7 +351,7 @@ describe('/posts', () => {
 
     it(`should delete post`, async () => {
         await request(app)
-            .delete('/posts/'+post.id)
+            .delete('/posts/' + post.id)
             .set('authorization', 'Basic YWRtaW46cXdlcnR5')
             .expect(204)
 

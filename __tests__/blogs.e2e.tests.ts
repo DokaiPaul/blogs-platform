@@ -2,6 +2,7 @@
 import request from "supertest";
 import {app} from "../src/settings";
 import {BlogsType} from "../src/models/view-models/blogs-view-model";
+import {client} from "../src/database/mongo-db";
 
 
 describe('/blogs', () => {

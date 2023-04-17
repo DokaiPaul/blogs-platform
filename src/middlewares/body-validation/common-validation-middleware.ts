@@ -69,3 +69,35 @@ export const blogIdValidationMiddleware = body('blogId')
         }
         return true;
     });
+
+export const loginValidation = body('login')
+    .notEmpty()
+    .bail()
+    .isString()
+    .withMessage('Login should be a string')
+    .bail()
+    .isLength({min: 3, max: 10})
+    .withMessage('Length is incorrect and must be from 3 to 10 symbols')
+    .bail()
+    .matches('^[a-zA-Z0-9_-]*$')
+    .withMessage('You use incorrect pattern')
+
+export const passwordValidation = body('password')
+    .notEmpty()
+    .bail()
+    .isString()
+    .withMessage('Password should be a string')
+    .bail()
+    .isLength({min: 6, max: 20})
+    .withMessage('Length is incorrect and must be from 6 to 20 symbols')
+    .bail()
+
+
+export const emailValidation = body('email')
+    .notEmpty()
+    .bail()
+    .isString()
+    .withMessage('Email should be a string')
+    .bail()
+    .matches(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)
+    .withMessage('You use incorrect pattern')

@@ -6,5 +6,5 @@ export type UsersType =
         _id?: ObjectId
         login: string,
         email: string,
-        createdAt: string
+        createdAt: Date | string
     }

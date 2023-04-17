@@ -19,3 +19,13 @@ export  type DeletedObject =
         deletedCount: number,
         acknowledged: boolean
     }
+
+export type CreateNewUser =
+    {
+        id?: string,
+        login: string,
+        passwordHash: string,
+        passwordSalt: string,
+        email: string,
+        createdAt: Date
+    }
