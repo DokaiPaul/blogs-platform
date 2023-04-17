@@ -1,4 +1,4 @@
-import {RequestWithParamsAndQuery} from "../../models/request-types";
+import {RequestWithQuery} from "../../models/request-types";
 import {QueryBlogsModel} from "../../models/query-models/query-blogs-model";
 import {processQuery} from "./utils/process-query-params";
 import {client} from "../../database/mongo-db";
@@ -9,7 +9,7 @@ import {Sort} from "mongodb";
 
 const blogsCollection = client.db('bloggers-platform').collection<BlogsType>('blogs')
 export const blogsQueryRepository = {
-    async findBlogs (req: RequestWithParamsAndQuery<{id: string}, QueryBlogsModel>): Promise<Paginator<BlogsType[]> | null | undefined> {
+    async findBlogs (req: RequestWithQuery<QueryBlogsModel>): Promise<Paginator<BlogsType[]> | null | undefined> {
         const [searchByTerm, sortBy, sortDir, pageNum, pageSize] = processQuery(req.query);
 
         let blogs: BlogsType[] | null;

@@ -2,7 +2,7 @@ import {MongoClient} from "mongodb";
 import * as dotenv from 'dotenv'
 dotenv.config()
 
-const url = process.env.MONGO_URL
+const url = process.env.MONGO_URL || 'mongodb://localhost:27017'
 
 if(!url){
     throw new Error('URL does not provided')

@@ -42,7 +42,6 @@ export const postsQueryRepository = {
         let posts: PostsType[] | null;
         let sort = {[sortBy]: sortDir} as Sort
 
-
         posts = await postCollection.find({blogId: req.params.id})
             .sort(sort)
             .limit(pageSize)
@@ -50,6 +49,7 @@ export const postsQueryRepository = {
             .toArray();
 
         if(posts.length < 1) return null;
+
         posts.forEach(p => changeKeyName(p, '_id','id'))
 
         const totalMatchedPosts = await postCollection.find({blogId: req.params.id}).count()
