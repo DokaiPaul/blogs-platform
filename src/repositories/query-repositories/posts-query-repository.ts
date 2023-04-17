@@ -5,6 +5,7 @@ import {QueryPostsModel} from "../../models/query-models/query-posts-model";
 import {changeKeyName} from "../../utils/object-operations";
 import {PostsType} from "../../models/view-models/posts-view-model";
 import {Paginator} from "../../models/view-models/paginator-view-model";
+import {Sort} from "mongodb";
 
 const postCollection = client.db('bloggers-platform').collection<PostsType>('posts')
 export const postsQueryRepository = {
@@ -13,11 +14,10 @@ export const postsQueryRepository = {
 
         let posts: PostsType[] | null;
         let filter = {};
-        let sort = {[sortBy]: sortDir}
+        let sort = {[sortBy]: sortDir} as Sort
 
 
         posts = await postCollection.find(filter)
-            // @ts-ignore
             .sort(sort)
             .limit(pageSize)
             .skip((pageNum - 1) * pageSize)
@@ -40,11 +40,10 @@ export const postsQueryRepository = {
         const [sortBy, sortDir, pageNum, pageSize] = parsePostsQuery(req.query);
 
         let posts: PostsType[] | null;
-        let sort = {[sortBy]: sortDir}
+        let sort = {[sortBy]: sortDir} as Sort
 
 
         posts = await postCollection.find({blogId: req.params.id})
-            // @ts-ignore
             .sort(sort)
             .limit(pageSize)
             .skip((pageNum - 1) * pageSize)

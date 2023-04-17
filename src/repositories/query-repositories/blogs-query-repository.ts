@@ -5,6 +5,7 @@ import {client} from "../../database/mongo-db";
 import {changeKeyName} from "../../utils/object-operations";
 import {BlogsType} from "../../models/view-models/blogs-view-model";
 import {Paginator} from "../../models/view-models/paginator-view-model";
+import {Sort} from "mongodb";
 
 const blogsCollection = client.db('bloggers-platform').collection<BlogsType>('blogs')
 export const blogsQueryRepository = {
@@ -13,14 +14,13 @@ export const blogsQueryRepository = {
 
         let blogs: BlogsType[] | null;
         let filter = {};
-        let sort = {[sortBy]: sortDir}
+        let sort = {[sortBy]: sortDir} as Sort
 
         if(searchByTerm) {
             filter = {name: {$regex: searchByTerm, $options: 'i'}}
         }
 
         blogs = await blogsCollection.find(filter)
-            // @ts-ignore
             .sort(sort)
             .limit(pageSize)
             .skip((pageNum - 1) * pageSize)
