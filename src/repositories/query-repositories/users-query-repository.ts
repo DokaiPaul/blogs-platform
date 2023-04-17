@@ -16,9 +16,9 @@ export const usersQueryRepository = {
         let filter = {}
         let sort = {[sortBy]: sortDir} as Sort
 
-        if(searchEmailTerm && searchLoginTerm) filter = {$and: [{login: {$regex: searchLoginTerm, $options: 'i'}}, {email: {$regex: searchEmailTerm, $options: 'i'}}]}
         if(searchEmailTerm) filter = {email: {$regex: searchEmailTerm, $options: 'i'}}
         if(searchLoginTerm) filter = {login: {$regex: searchLoginTerm, $options: 'i'}}
+        if(searchEmailTerm && searchLoginTerm) filter = {$or: [{login: {$regex: searchLoginTerm, $options: 'i'}}, {email: {$regex: searchEmailTerm, $options: 'i'}}]}
 
         const users = await usersCollection.find(filter)
             .sort(sort)
@@ -34,7 +34,7 @@ export const usersQueryRepository = {
             delete u.passwordHash
         })
 
-        const totalMatchedPosts = await usersCollection.find(filter).count()
+        const totalMatchedPosts = await usersCollection.countDocuments(filter)
         const totalPages = Math.ceil(totalMatchedPosts / pageSize)
 
         return {
