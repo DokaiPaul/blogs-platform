@@ -1,7 +1,8 @@
 import {Request, Response, Router} from "express";
 import {videos_db} from "../database/videos_db";
 import {client} from "../database/mongo-db";
-import {PostsType} from "../models/input-models/posts-input-model";
+import {PostsType} from "../models/view-models/posts-view-model";
+
 
 export const testingRouter = Router({})
 

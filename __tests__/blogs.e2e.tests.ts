@@ -1,7 +1,8 @@
 // @ts-ignore
 import request from "supertest";
 import {app} from "../src/settings";
-import {BlogsType} from "../src/models/input-models/blogs-input-model";
+import {BlogsType} from "../src/models/view-models/blogs-view-model";
+
 
 describe('/blogs', () => {
     let createdBlog: BlogsType;
@@ -10,7 +11,7 @@ describe('/blogs', () => {
     })
 
     it('GET all blogs', async () => {
-        await request(app).get('/blogs').expect(200,[])
+        await request(app).get('/blogs').expect(200,{ pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: [] })
     });
 
     it('shouldn\'t create blog without authorization', async () => {
@@ -25,7 +26,7 @@ describe('/blogs', () => {
 
         await request(app)
             .get('/blogs')
-            .expect(200, [])
+            .expect(200, { pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: [] })
     })
 
     it('should create new blog', async  () => {
@@ -368,6 +369,6 @@ describe('/blogs', () => {
 
         await request(app)
             .get('/blogs')
-            .expect(200, [])
+            .expect(200, { pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: [] })
     })
 })

@@ -1,10 +1,11 @@
-import {PostInputType, PostsType} from "../models/input-models/posts-input-model";
+import {PostInputType} from "../models/input-models/posts-input-model";
 import {client} from "../database/mongo-db";
-import {BlogsType} from "../models/input-models/blogs-input-model";
 import {changeKeyName} from "../utils/object-operations";
 import {ObjectId} from "mongodb";
 import {postsRepository} from "../repositories/posts-repository";
 import {blogsService} from "./blogs-service";
+import {BlogsType} from "../models/view-models/blogs-view-model";
+import {PostsType} from "../models/view-models/posts-view-model";
 
 const blogsCollection = client.db('bloggers-platform').collection<BlogsType>('blogs')
 export const postsService = {

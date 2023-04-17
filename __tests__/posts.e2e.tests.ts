@@ -4,6 +4,7 @@ import {app} from "../src/settings";
 import {BlogsType} from "../src/models/view-models/blogs-view-model";
 import {PostsType} from "../src/models/view-models/posts-view-model";
 
+
 describe('/posts', () => {
     let blog: BlogsType;
     let post: PostsType;
@@ -21,7 +22,7 @@ describe('/posts', () => {
     });
 
     it('GET all posts', async () => {
-        await request(app).get('/posts').expect(200, [])
+        await request(app).get('/posts').expect(200, { pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: [] })
     });
 
     //add tests after API development is done
@@ -36,7 +37,7 @@ describe('/posts', () => {
             })
             .expect(401)
 
-        await request(app).get('/posts').expect(200, [])
+        await request(app).get('/posts').expect(200, { pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: [] })
     });
 
     it(`shouldn't create post with title that is not string`, async () => {
@@ -54,7 +55,7 @@ describe('/posts', () => {
                     field: 'title'
                 }]})
 
-        await request(app).get('/posts').expect(200, [])
+        await request(app).get('/posts').expect(200, { pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: [] })
     });
 
     it(`shouldn't create post with empty title`, async () => {
@@ -72,7 +73,7 @@ describe('/posts', () => {
                     field: 'title'
                 }]})
 
-        await request(app).get('/posts').expect(200, [])
+        await request(app).get('/posts').expect(200, { pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: [] })
     });
 
     it(`shouldn't create post with title that longer than 30 symbols`, async () => {
@@ -90,7 +91,7 @@ describe('/posts', () => {
                     field: 'title'
                 }]})
 
-        await request(app).get('/posts').expect(200, [])
+        await request(app).get('/posts').expect(200, { pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: [] })
     });
 
     it(`shouldn't create post with shortDecription that is not a string`, async () => {
@@ -108,7 +109,7 @@ describe('/posts', () => {
                     field: 'shortDescription'
                 }]})
 
-        await request(app).get('/posts').expect(200, [])
+        await request(app).get('/posts').expect(200, { pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: [] })
     });
 
     it(`shouldn't create post with empty shortDecription`, async () => {
@@ -126,7 +127,7 @@ describe('/posts', () => {
                     field: 'shortDescription'
                 }]})
 
-        await request(app).get('/posts').expect(200, [])
+        await request(app).get('/posts').expect(200, { pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: [] })
     });
 
     it(`shouldn't create post with shortDecription that is longer than 100 symbols`, async () => {
@@ -144,7 +145,7 @@ describe('/posts', () => {
                     field: 'shortDescription'
                 }]})
 
-        await request(app).get('/posts').expect(200, [])
+        await request(app).get('/posts').expect(200, { pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: [] })
     });
 
     it(`shouldn't create post if content is not a string`, async () => {
@@ -162,7 +163,7 @@ describe('/posts', () => {
                     field: 'content'
                 }]})
 
-        await request(app).get('/posts').expect(200, [])
+        await request(app).get('/posts').expect(200, { pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: [] })
     });
 
     it(`shouldn't create post with empty content`, async () => {
@@ -180,7 +181,7 @@ describe('/posts', () => {
                     field: 'content'
                 }]})
 
-        await request(app).get('/posts').expect(200, [])
+        await request(app).get('/posts').expect(200, { pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: [] })
     });
 
     it(`shouldn't create post if blogId is not string`, async () => {
@@ -198,7 +199,7 @@ describe('/posts', () => {
                     field: 'blogId'
                 }]})
 
-        await request(app).get('/posts').expect(200, [])
+        await request(app).get('/posts').expect(200, { pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: [] })
     });
 
     it(`shouldn't create post if blogId doesn't exist in blogs_db`, async () => {
@@ -216,7 +217,7 @@ describe('/posts', () => {
                     field: 'blogId'
                 }]})
 
-        await request(app).get('/posts').expect(200, [])
+        await request(app).get('/posts').expect(200, { pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: [] })
     });
 
     it(`should create post with correct data`, async () => {
@@ -245,7 +246,7 @@ describe('/posts', () => {
 
         const get = await request(app).get('/posts').expect(200)
 
-        expect(get.body).toEqual([post])
+        expect(get.body.items).toEqual([post])
     });
 
     it(`shouldn't update post without authorization`, async () => {
@@ -261,7 +262,7 @@ describe('/posts', () => {
 
         const get = await request(app).get('/posts').expect(200)
 
-        expect(get.body).toEqual([post])
+        expect(get.body.items).toEqual([post])
     });
 
     it(`shouldn't update post by incorrect id`, async () => {
@@ -278,7 +279,7 @@ describe('/posts', () => {
 
         const get = await request(app).get('/posts').expect(200)
 
-        expect(get.body).toEqual([post])
+        expect(get.body.items).toEqual([post])
     });
 
     it(`should update post with correct data`, async () => {
@@ -294,7 +295,7 @@ describe('/posts', () => {
             .expect(204)
 
         const get = await request(app).get('/posts').expect(200)
-        post = get.body[0]
+        post = get.body.items[0]
         expect(post).toEqual({
             id: expect.any(String),
             title: 'updated post',
@@ -302,7 +303,7 @@ describe('/posts', () => {
             content: 'blablabla',
             blogId: blog.id,
             blogName: 'Jest tests',
-            createdAt: post.createdAt
+            createdAt: expect.any(String)
         })
     });
 
@@ -313,7 +314,7 @@ describe('/posts', () => {
 
         const get = await request(app).get('/posts').expect(200)
 
-        expect(get.body).toEqual([post])
+        expect(get.body.items).toEqual([post])
     })
 
     it(`shouldn't delete by incorrect id`, async () => {
@@ -324,7 +325,7 @@ describe('/posts', () => {
 
         const get = await request(app).get('/posts').expect(200)
 
-        expect(get.body).toEqual([post])
+        expect(get.body.items).toEqual([post])
     })
 
     it(`should delete post`, async () => {
@@ -335,6 +336,6 @@ describe('/posts', () => {
 
         const get = await request(app).get('/posts').expect(200)
 
-        expect(get.body).toEqual([])
+        expect(get.body.items).toEqual([])
     })
 })

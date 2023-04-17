@@ -1,8 +1,10 @@
-import {BlogInputType, BlogsType} from "../models/input-models/blogs-input-model";
+import {BlogInputType} from "../models/input-models/blogs-input-model";
 import {changeKeyName} from "../utils/object-operations";
 import {blogsRepository} from "../repositories/blogs-repository";
-import {PostInputType, PostsType} from "../models/input-models/posts-input-model";
+import {PostInputType} from "../models/input-models/posts-input-model";
 import {postsRepository} from "../repositories/posts-repository";
+import {PostsType} from "../models/view-models/posts-view-model";
+import {BlogsType} from "../models/view-models/blogs-view-model";
 
 export const blogsService = {
     async findAllBlogs (): Promise<BlogsType[] | {}> {
