@@ -5,9 +5,10 @@ import {parseUsersQuery} from "./utils/process-query-params";
 import {Sort} from "mongodb";
 import {changeKeyName} from "../../utils/object-operations";
 import {Paginator} from "../../models/view-models/paginator-view-model";
+import {CreateNewUser} from "../../models/additional-types/mongo-db-types";
 
 
-const usersCollection =  client.db('bloggers-platform').collection<UsersType>('users')
+const usersCollection =  client.db('bloggers-platform').collection<CreateNewUser>('users')
 
 export const usersQueryRepository = {
     async findUsers (query: QueryUsersModel): Promise<Paginator<UsersType[]>> {
@@ -26,6 +27,12 @@ export const usersQueryRepository = {
             .toArray();
 
         users.forEach(b => changeKeyName(b, '_id', 'id'))
+        users.map(u => {
+            // @ts-ignore
+            delete u.passwordSalt
+            // @ts-ignore
+            delete u.passwordHash
+        })
 
         const totalMatchedPosts = await usersCollection.find(filter).count()
         const totalPages = Math.ceil(totalMatchedPosts / pageSize)
