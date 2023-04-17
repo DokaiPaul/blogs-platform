@@ -1,7 +1,7 @@
-import {BlogInputType, BlogsType} from "../types/blogs-types";
+import {BlogInputType, BlogsType} from "../models/input-models/blogs-input-model";
 import {changeKeyName} from "../utils/object-operations";
 import {blogsRepository} from "../repositories/blogs-repository";
-import {PostInputType, PostsType} from "../types/posts-types";
+import {PostInputType, PostsType} from "../models/input-models/posts-input-model";
 import {postsRepository} from "../repositories/posts-repository";
 
 export const blogsService = {

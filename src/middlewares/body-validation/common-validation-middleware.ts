@@ -1,5 +1,5 @@
 import {body} from "express-validator";
-import {blogsRepository} from "../repositories/blogs-repository";
+import {blogsRepository} from "../../repositories/blogs-repository";
 
 export const nameValidationMiddleware = body('name')
     .notEmpty()
@@ -23,7 +23,7 @@ export const descriptionValidationMiddleware = body('description')
 
 export const websiteUrlValidationMiddleware = body('websiteUrl')
     .notEmpty()
-    .withMessage('Web site field should be not empty')
+    .withMessage('Website field should be not empty')
     .bail()
     .isString()
     .withMessage('Website URL should be a string')

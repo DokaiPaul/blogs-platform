@@ -1,7 +1,8 @@
-import {PostInputType, PostsType} from "../types/posts-types";
+import {PostInputType} from "../models/input-models/posts-input-model";
 import {client} from "../database/mongo-db";
 import {ObjectId} from "mongodb";
-import {DeletedObject, InsertedObject, UpdatedObject} from "../types/mongo-db-types";
+import {DeletedObject, InsertedObject, UpdatedObject} from "../models/additional-types/mongo-db-types";
+import {PostsType} from "../models/view-models/posts-view-model";
 
 const postCollection = client.db('bloggers-platform').collection<PostsType>('posts')
 export const postsRepository = {

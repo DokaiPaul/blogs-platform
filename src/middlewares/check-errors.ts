@@ -1,7 +1,7 @@
 import {NextFunction, Request, Response} from "express";
 import {validationResult} from "express-validator";
 import {errorMsg} from "../utils/errors/errors";
-import {ErrorMessages} from "../types/errors-types";
+import {ErrorMessages} from "../models/additional-types/errors-types";
 
 export const checkErrors = (req: Request, res: Response, next: NextFunction) => {
     const errorsArr: ErrorMessages = {

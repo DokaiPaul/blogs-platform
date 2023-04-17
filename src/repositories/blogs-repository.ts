@@ -1,7 +1,8 @@
-import {BlogInputType, BlogsType} from "../types/blogs-types";
+import {BlogInputType} from "../models/input-models/blogs-input-model";
 import {client} from "../database/mongo-db";
 import {ObjectId} from "mongodb";
-import {DeletedObject, InsertedObject, UpdatedObject} from "../types/mongo-db-types";
+import {DeletedObject, InsertedObject, UpdatedObject} from "../models/additional-types/mongo-db-types";
+import {BlogsType} from "../models/view-models/blogs-view-model";
 
 const blogsCollection = client.db('bloggers-platform').collection<BlogsType>('blogs')
 export const blogsRepository = {

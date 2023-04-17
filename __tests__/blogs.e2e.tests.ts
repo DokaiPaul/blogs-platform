@@ -1,7 +1,7 @@
 // @ts-ignore
 import request from "supertest";
 import {app} from "../src/settings";
-import {BlogsType} from "../src/types/blogs-types";
+import {BlogsType} from "../src/models/input-models/blogs-input-model";
 
 describe('/blogs', () => {
     let createdBlog: BlogsType;

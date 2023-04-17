@@ -1,7 +1,7 @@
 import {Request, Response, Router} from "express";
 import {videos_db} from "../database/videos_db";
 import {postRequestValidate} from "../utils/validation/post-request-validation";
-import {VideoType} from "../types/videos-types";
+import {VideoType} from "../models/view-models/videos-view-model";
 import {putRequestValidate} from "../utils/validation/put-request-validation";
 
 

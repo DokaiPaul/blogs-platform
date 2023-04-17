@@ -1,7 +1,7 @@
 // @ts-ignore
 import request from 'supertest'
 import { app } from '../src/settings'
-import {VideoType} from "../src/types/videos-types";
+import {VideoType} from "../src/models/view-models/videos-view-model";
 //
 describe('/videos', () => {
     let newVideo: VideoType | null = null

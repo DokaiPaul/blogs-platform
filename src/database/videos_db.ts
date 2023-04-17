@@ -1,4 +1,4 @@
-import {VideoType} from "../types/videos-types";
+import {VideoType} from "../models/view-models/videos-view-model";
 
 export let videos_db: VideoType[] = [
     {

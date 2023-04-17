@@ -1,6 +1,6 @@
-import {PostInputType, PostsType} from "../types/posts-types";
+import {PostInputType, PostsType} from "../models/input-models/posts-input-model";
 import {client} from "../database/mongo-db";
-import {BlogsType} from "../types/blogs-types";
+import {BlogsType} from "../models/input-models/blogs-input-model";
 import {changeKeyName} from "../utils/object-operations";
 import {ObjectId} from "mongodb";
 import {postsRepository} from "../repositories/posts-repository";

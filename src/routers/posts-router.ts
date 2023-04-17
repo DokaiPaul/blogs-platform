@@ -1,11 +1,11 @@
 import {Router, Response, Request} from "express";
 import {authorizationMiddleware} from "../middlewares/authorization-middleware";
 import {checkErrors} from "../middlewares/check-errors";
-import {postBodyValidationMiddleware} from "../middlewares/body-validation-middleware";
+import {postBodyValidationMiddleware} from "../middlewares/body-validation/body-validation-middleware";
 import {param} from "express-validator";
 import {postsService} from "../domain/posts-service";
-import {postsQueryRepository} from "../query-repositories/posts-query-repository";
-import {RequestWithQuery} from "../types/request-types";
+import {postsQueryRepository} from "../repositories/query-repositories/posts-query-repository";
+import {RequestWithQuery} from "../models/request-types";
 import {QueryPostsModel} from "../models/query-models/query-posts-model";
 
 export const postsRouter = Router({});

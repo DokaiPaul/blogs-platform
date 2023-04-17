@@ -1,14 +1,15 @@
-import {RequestWithParamsAndQuery} from "../types/request-types";
-import {QueryBlogsModel} from "../models/query-models/query-blogs-model";
-import {parseBlogsQuery} from "./utils/process-query-params";
-import {BlogsType} from "../types/blogs-types";
-import {client} from "../database/mongo-db";
-import {changeKeyName} from "../utils/object-operations";
+import {RequestWithParamsAndQuery} from "../../models/request-types";
+import {QueryBlogsModel} from "../../models/query-models/query-blogs-model";
+import {processQuery} from "./utils/process-query-params";
+import {client} from "../../database/mongo-db";
+import {changeKeyName} from "../../utils/object-operations";
+import {BlogsType} from "../../models/view-models/blogs-view-model";
+import {Paginator} from "../../models/view-models/paginator-view-model";
 
 const blogsCollection = client.db('bloggers-platform').collection<BlogsType>('blogs')
 export const blogsQueryRepository = {
-    async findBlogs (req: RequestWithParamsAndQuery<{id: string}, QueryBlogsModel>): Promise<BlogsType[] | null | undefined> {
-        const [searchByTerm, sortBy, sortDir, pageNum, pageSize] = parseBlogsQuery(req.query);
+    async findBlogs (req: RequestWithParamsAndQuery<{id: string}, QueryBlogsModel>): Promise<Paginator<BlogsType[]> | null | undefined> {
+        const [searchByTerm, sortBy, sortDir, pageNum, pageSize] = processQuery(req.query);
 
         let blogs: BlogsType[] | null;
         let filter = {};
@@ -30,14 +31,12 @@ export const blogsQueryRepository = {
         const totalMatchedPosts = await blogsCollection.find(filter).count()
         const totalPages = Math.ceil(totalMatchedPosts / pageSize)
 
-        const paginator = {
+        return {
             pagesCount: totalPages,
             page: pageNum,
             pageSize: pageSize,
             totalCount: totalMatchedPosts,
             items: blogs
-        }
-        // @ts-ignore
-        return paginator;
+        };
     }
 }

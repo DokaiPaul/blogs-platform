@@ -1,15 +1,14 @@
 import {Request, Response, Router} from "express";
-import {bodyValidationMiddleware, postInBlogBodyValidationMiddleware} from "../middlewares/body-validation-middleware";
+import {bodyValidationMiddleware, postInBlogBodyValidationMiddleware} from "../middlewares/body-validation/body-validation-middleware";
 import {checkErrors} from "../middlewares/check-errors";
 import {authorizationMiddleware} from "../middlewares/authorization-middleware";
 import {param} from "express-validator";
 import {blogsService} from "../domain/blogs-service";
-import {postsService} from "../domain/posts-service";
-import {RequestWithParamsAndQuery} from "../types/request-types";
+import {RequestWithParamsAndQuery} from "../models/request-types";
 import {QueryBlogsModel} from "../models/query-models/query-blogs-model";
-import {blogsQueryRepository} from "../query-repositories/blogs-query-repository";
+import {blogsQueryRepository} from "../repositories/query-repositories/blogs-query-repository";
 import {QueryPostsModel} from "../models/query-models/query-posts-model";
-import {postsQueryRepository} from "../query-repositories/posts-query-repository";
+import {postsQueryRepository} from "../repositories/query-repositories/posts-query-repository";
 
 export const blogsRouter = Router({})
 
