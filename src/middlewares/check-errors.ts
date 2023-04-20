@@ -13,7 +13,7 @@ export const checkErrors = (req: Request, res: Response, next: NextFunction) => 
         errors.array().forEach(e => {
             let errorsResult = errorMsg(e.msg, e.param)
             errorsArr.errorsMessages.push(errorsResult)
-            if(e.param === 'authorization') { //if the error is because of authorisation return 401 status
+            if(e.param === 'authorization') { //if the error is because of authorization return 401 status
                 res.status(401).json(errorsArr)
                 return
             }

@@ -4,3 +4,8 @@ export type User = {
     password: string,
     base64Encode: string
 }
+
+export type LoginSuccessViewModel =
+    {
+        accessToken: string
+    }

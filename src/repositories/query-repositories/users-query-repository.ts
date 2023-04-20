@@ -44,5 +44,8 @@ export const usersQueryRepository = {
             totalCount: totalMatchedPosts,
             items: users
         };
+    },
+    async findUserById (id: string) {
+
     }
 }

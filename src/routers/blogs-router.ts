@@ -1,7 +1,7 @@
 import {Request, Response, Router} from "express";
 import {bodyValidationMiddleware, postInBlogBodyValidationMiddleware} from "../middlewares/body-validation/body-validation-middleware";
 import {checkErrors} from "../middlewares/check-errors";
-import {authorizationMiddleware} from "../middlewares/authorization-middleware";
+import {adminAuthMiddleware} from "../middlewares/admin-auth-middleware";
 import {param} from "express-validator";
 import {blogsService} from "../domain/blogs-service";
 import {RequestWithParamsAndQuery} from "../models/request-types";
@@ -46,7 +46,7 @@ blogsRouter.get('/:id/posts', param('id').isMongoId(), checkErrors,
 })
 
 blogsRouter.post('/' ,
-    authorizationMiddleware,
+    adminAuthMiddleware,
     bodyValidationMiddleware,
     checkErrors,
     async (req: Request, res: Response) => {
@@ -58,7 +58,7 @@ blogsRouter.post('/' ,
 
 blogsRouter.post('/:id/posts',
     param('id').isMongoId(),
-    authorizationMiddleware,
+    adminAuthMiddleware,
     postInBlogBodyValidationMiddleware,
     checkErrors,
     async (req: Request, res: Response) => {
@@ -74,7 +74,7 @@ blogsRouter.post('/:id/posts',
 
 blogsRouter.put('/:id',
     param('id').isMongoId(),
-    authorizationMiddleware,
+    adminAuthMiddleware,
     bodyValidationMiddleware,
     checkErrors,
     async (req: Request, res: Response) => {
@@ -90,7 +90,7 @@ blogsRouter.put('/:id',
 
 blogsRouter.delete('/:id',
     param('id').isMongoId(),
-    authorizationMiddleware,
+    adminAuthMiddleware,
     checkErrors,
     async (req: Request, res: Response) => {
 

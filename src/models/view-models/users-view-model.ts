@@ -8,3 +8,11 @@ export type UsersType =
         email: string,
         createdAt: Date | string
     }
+
+
+export type MeViewModel =
+    {
+        email: string,
+        login: string,
+        userId: string
+    }

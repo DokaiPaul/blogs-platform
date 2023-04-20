@@ -2,7 +2,7 @@ import {header} from "express-validator";
 import {users} from "../database/users-db";
 import {decodeBase64} from "../utils/decoders";
 
-export const authorizationMiddleware = header('Authorization')
+export const adminAuthMiddleware = header('Authorization')
     .notEmpty()
     .withMessage('You do not have permissions to perform this action')
     .bail()

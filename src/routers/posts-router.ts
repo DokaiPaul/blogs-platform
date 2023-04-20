@@ -1,5 +1,5 @@
 import {Router, Response, Request} from "express";
-import {authorizationMiddleware} from "../middlewares/authorization-middleware";
+import {adminAuthMiddleware} from "../middlewares/admin-auth-middleware";
 import {checkErrors} from "../middlewares/check-errors";
 import {postBodyValidationMiddleware} from "../middlewares/body-validation/body-validation-middleware";
 import {param} from "express-validator";
@@ -26,9 +26,17 @@ postsRouter.get('/:id', param('id').isMongoId(), checkErrors, async (req: Reques
 
     res.send(post);
 })
+//todo add two routers below for process comments in posts
+postsRouter.get('/:id/comments', param('id').isMongoId(), checkErrors, async (req: Request, res: Response) => {
+
+})
+
+postsRouter.post('/:id/comments', param('id').isMongoId(), checkErrors, async (req: Request, res: Response) => {
+
+})
 
 postsRouter.post('/',
-    authorizationMiddleware,
+    adminAuthMiddleware,
     postBodyValidationMiddleware,
     checkErrors,
     async (req: Request, res: Response) => {
@@ -44,7 +52,7 @@ postsRouter.post('/',
 
 postsRouter.put('/:id',
     param('id').isMongoId(),
-    authorizationMiddleware,
+    adminAuthMiddleware,
     postBodyValidationMiddleware,
     checkErrors,
     async (req: Request, res: Response) => {
@@ -60,7 +68,7 @@ postsRouter.put('/:id',
 
 postsRouter.delete('/:id',
     param('id').isMongoId(),
-    authorizationMiddleware,
+    adminAuthMiddleware,
     checkErrors,
     async (req: Request, res: Response) => {
 
