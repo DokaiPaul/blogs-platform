@@ -1,12 +1,18 @@
 import {Router, Response, Request} from "express";
 import {adminAuthMiddleware} from "../middlewares/admin-auth-middleware";
 import {checkErrors} from "../middlewares/check-errors";
-import {postBodyValidationMiddleware} from "../middlewares/body-validation/body-validation-middleware";
+import {
+    commentBodyValidationMiddleware,
+    postBodyValidationMiddleware
+} from "../middlewares/body-validation/body-validation-middleware";
 import {param} from "express-validator";
 import {postsService} from "../domain/posts-service";
 import {postsQueryRepository} from "../repositories/query-repositories/posts-query-repository";
 import {RequestWithQuery} from "../models/request-types";
 import {QueryPostsModel} from "../models/query-models/query-posts-model";
+import {authMiddleware} from "../middlewares/autorization-middleware";
+import {commentsService} from "../domain/comments-service";
+import {commentsQueryRepository} from "../repositories/query-repositories/comments-query-repository";
 
 export const postsRouter = Router({});
 
@@ -28,10 +34,32 @@ postsRouter.get('/:id', param('id').isMongoId(), checkErrors, async (req: Reques
 })
 //todo add two routers below for process comments in posts
 postsRouter.get('/:id/comments', param('id').isMongoId(), checkErrors, async (req: Request, res: Response) => {
+    const post = await postsService.findPostById(req.params.id)
 
+    if(!post) {
+        res.sendStatus(404)
+        return
+    }
+
+    // @ts-ignore
+    const comments = await commentsQueryRepository.findCommentsInPost(req)
+    res.status(200).send(comments)
 })
 
-postsRouter.post('/:id/comments', param('id').isMongoId(), checkErrors, async (req: Request, res: Response) => {
+postsRouter.post('/:id/comments', param('id').isMongoId(),
+    authMiddleware,
+    commentBodyValidationMiddleware,
+    checkErrors,
+    async (req: Request, res: Response) => {
+    const post = await postsService.findPostById(req.params.id)
+
+    if(!post) {
+        res.sendStatus(404)
+        return
+    }
+// @ts-ignore
+    const newComment = await commentsService.createComment(req)
+    res.status(201).json(newComment)
 
 })
 

@@ -15,3 +15,11 @@ type CommentatorInfo =
         userLogin: string
     }
 
+    export type CommentsDB =
+        {
+            _id?: ObjectId,
+            content: string,
+            commentatorInfo: CommentatorInfo,
+            createdAt: string,
+            postId: string
+        }

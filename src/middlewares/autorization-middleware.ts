@@ -1,5 +1,4 @@
 import {NextFunction, Request, Response} from "express";
-import {usersQueryRepository} from "../repositories/query-repositories/users-query-repository";
 import {jwtService} from "../application/jwt-service";
 
 export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
@@ -12,10 +11,10 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
 
     const userId = await jwtService.getUserByIdToken(token)
     if(userId) {
-        req.user = await usersQueryRepository.findUserById(userId)
+        //@ts-ignore
+        req.userId = userId
         next()
         return
     }
     res.sendStatus(401)
-    next()
 }

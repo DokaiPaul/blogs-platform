@@ -1,5 +1,5 @@
 import {
-    blogIdValidationMiddleware,
+    blogIdValidationMiddleware, contentValidation,
     contentValidationMiddleware,
     descriptionValidationMiddleware, emailValidation, loginValidation,
     nameValidationMiddleware, passwordValidation, shortDescriptionValidationMiddleware, titleValidationMiddleware,
@@ -29,4 +29,8 @@ export const usersBodyValidationMiddleware = [
     loginValidation,
     passwordValidation,
     emailValidation
+]
+
+export const commentBodyValidationMiddleware = [
+    contentValidation
 ]

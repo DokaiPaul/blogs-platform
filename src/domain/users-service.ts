@@ -28,8 +28,8 @@ export const userService = {
             email: body.email,
             createdAt: newUser.createdAt.toISOString()
         }
-    },
-    async checkUsersCredentials (body: LoginInputModel): Promise<boolean> {
+    },//@ts-ignore
+    async checkUsersCredentials (body: LoginInputModel): Promise<CreateNewUser | boolean | undefined> {
         const {loginOrEmail, password} = body;
         const user = await usersRepository.findByLoginOrEmail(loginOrEmail);
         if(!user) return false;
@@ -37,7 +37,9 @@ export const userService = {
         const passwordSalt = user.passwordSalt
         const passwordHash = await this._generateHash(password, passwordSalt)
 
-        return passwordHash === user.passwordHash
+        if(passwordHash === user.passwordHash) {
+            return user
+        }
     },
     async deleteUser (id: string): Promise<boolean> {
         const result = await usersRepository.deleteUser(id)

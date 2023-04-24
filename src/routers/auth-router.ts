@@ -4,20 +4,25 @@ import {passwordValidation} from "../middlewares/body-validation/common-validati
 import {body} from "express-validator";
 import {checkErrors} from "../middlewares/check-errors";
 import {usersQueryRepository} from "../repositories/query-repositories/users-query-repository";
+import {authMiddleware} from "../middlewares/autorization-middleware";
+import {jwtService} from "../application/jwt-service";
 
 export const authRouter = Router({})
 
 authRouter.post('/login', body('loginOrEmail').isString(), passwordValidation, checkErrors, async (req: Request, res: Response) => {
-    const isAllowed = await userService.checkUsersCredentials(req.body)
-    if(isAllowed) {
-        res.sendStatus(204)
+    const user = await userService.checkUsersCredentials(req.body)
+    if(user) {
+        //@ts-ignore
+        const token = await jwtService.createJWT(user)
+        res.status(200).json({"accessToken": token})
         return
     }
     res.sendStatus(401)
 })
 
-authRouter.get('/me', , async (req: Request, res: Response) => {
-    const person = await usersQueryRepository.findUserById(req.headers.id)
+authRouter.get('/me', authMiddleware, async (req: Request, res: Response) => {
+    //@ts-ignore
+    const person = await usersQueryRepository.findUserById(req.userId)
 
     res.status(200).json(person)
 })

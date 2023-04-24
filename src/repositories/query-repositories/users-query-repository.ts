@@ -2,7 +2,7 @@ import {client} from "../../database/mongo-db";
 import {UsersType} from "../../models/view-models/users-view-model";
 import {QueryUsersModel} from "../../models/query-models/query-users-model";
 import {parseUsersQuery} from "./utils/process-query-params";
-import {Sort} from "mongodb";
+import {ObjectId, Sort} from "mongodb";
 import {changeKeyName} from "../../utils/object-operations";
 import {Paginator} from "../../models/view-models/paginator-view-model";
 import {CreateNewUser} from "../../models/additional-types/mongo-db-types";
@@ -45,7 +45,15 @@ export const usersQueryRepository = {
             items: users
         };
     },
-    async findUserById (id: string) {
+    async findUserById(id: string): Promise<{ email: string; login: string; userId: string } | null> {
+        const user = await usersCollection.findOne({_id: new ObjectId(id)})
 
+        if(!user) return null
+
+        return {
+            email: user.email,
+            login: user.login,
+            userId: user._id.toString()
+        }
     }
 }
