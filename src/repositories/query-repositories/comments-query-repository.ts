@@ -41,7 +41,7 @@ export const commentsQueryRepository =
         },
         async findCommentById (id: string) {
             const comment = await commentsCollection.findOne({_id: new ObjectId(id)})
-            if(!comment) return {}
+            if(!comment) return null
             delete comment.postId
             changeKeyName(comment, '_id', 'id')
 
