@@ -13,7 +13,6 @@ export const commentsQueryRepository =
             const [sortBy, sortDir, pageNum, pageSize] = parsePostsQuery(req.query);
 
             let comments: CommentsDB[] | null;
-            let filter = {};
             let sort = {[sortBy]: sortDir} as Sort
 // @ts-ignore
             comments = await commentsCollection.find({postId: req.params.id})
@@ -28,7 +27,7 @@ export const commentsQueryRepository =
                 changeKeyName(v, '_id', 'id')
             })
 
-            const totalMatchedPosts = await commentsCollection.find(filter).count()
+            const totalMatchedPosts = await commentsCollection.find({postId: req.params.id}).count()
             const totalPages = Math.ceil(totalMatchedPosts / pageSize)
 
             // @ts-ignore
@@ -41,6 +40,11 @@ export const commentsQueryRepository =
             }
         },
         async findCommentById (id: string) {
-            return await commentsCollection.findOne({_id: new ObjectId(id)})
+            const comment = await commentsCollection.findOne({_id: new ObjectId(id)})
+            if(!comment) return {}
+            delete comment.postId
+            changeKeyName(comment, '_id', 'id')
+
+            return comment
         }
     }
