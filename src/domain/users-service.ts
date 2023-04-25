@@ -1,7 +1,6 @@
 import {usersRepository} from "../repositories/users-repository";
 import {UsersViewModel} from "../models/view-models/users-view-model";
 import {UserInputType} from "../models/input-models/users-input-models";
-import {changeKeyName} from "../utils/object-operations";
 import bcrypt from 'bcrypt'
 import {LoginInputModel} from "../models/input-models/login-input-model";
 import {UserDbModel} from "../models/mongo-db-models/users-db-model";
@@ -20,14 +19,12 @@ export const userService = {
         }
 
         await usersRepository.createUser(newUser)
-        const output: UsersViewModel = {...newUser}
-        changeKeyName(output, '_id', 'id')
 
         return {
-            id: output.id,
-            login: output.login,
-            email: output.email,
-            createdAt: output.createdAt.toString()
+            id: newUser._id!.toString(),
+            login: newUser.login,
+            email: newUser.email,
+            createdAt: newUser.createdAt.toISOString()
         }
     },
     async checkUsersCredentials (body: LoginInputModel): Promise<UserDbModel | null | undefined> {
