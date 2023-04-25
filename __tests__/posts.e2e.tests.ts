@@ -3,10 +3,9 @@ import request from "supertest";
 import {app} from "../src/settings";
 import {BlogsType} from "../src/models/view-models/blogs-view-model";
 import {PostsType} from "../src/models/view-models/posts-view-model";
-import {client} from "../src/database/mongo-db";
 
 
-describe('/posts', async () => {
+describe('/posts', () => {
     let blog: BlogsType;
     let post: PostsType;
     beforeAll(async () => {

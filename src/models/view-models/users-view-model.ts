@@ -1,12 +1,11 @@
-import {ObjectId} from "mongodb";
-
-export type UsersType =
+export type UsersViewModel =
     {
         id?: string,
-        _id?: ObjectId
         login: string,
         email: string,
-        createdAt: Date | string
+        createdAt: Date | string,
+        passwordSalt?: string,
+        passwordHash?: string
     }
 
 

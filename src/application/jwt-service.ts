@@ -1,12 +1,11 @@
-import {UsersType} from "../models/view-models/users-view-model";
 import jwt from 'jsonwebtoken'
-import {ObjectId} from "mongodb";
+import {UserDbModel} from "../models/mongo-db-models/users-db-model";
 
 const secret = process.env.JWT_SECRET || '123'
 
 export const jwtService =
     {
-        async createJWT (user: UsersType) {
+        async createJWT (user: UserDbModel) {
             const token = jwt.sign({userId: user._id}, secret, {expiresIn: '1d'})
 
             return token;

@@ -12,7 +12,6 @@ export const authRouter = Router({})
 authRouter.post('/login', body('loginOrEmail').isString(), passwordValidation, checkErrors, async (req: Request, res: Response) => {
     const user = await userService.checkUsersCredentials(req.body)
     if(user) {
-        //@ts-ignore
         const token = await jwtService.createJWT(user)
         res.status(200).json({"accessToken": token})
         return

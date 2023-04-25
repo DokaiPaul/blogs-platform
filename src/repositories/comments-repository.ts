@@ -1,12 +1,13 @@
 import {DeletedObject, InsertedObject, UpdatedObject} from "../models/additional-types/mongo-db-types";
 import {client} from "../database/mongo-db";
-import {CommentsDB, CommentViewModel} from "../models/view-models/comments-view-model";
+import {CommentViewModel} from "../models/view-models/comments-view-model";
 import {ObjectId} from "mongodb";
+import {CommentsDbModel} from "../models/mongo-db-models/comments-db-model";
 
-const commentsCollection = client.db('bloggers-platform').collection<CommentsDB>('comments')
+const commentsCollection = client.db('bloggers-platform').collection<CommentsDbModel>('comments')
 export const commentsRepository =
     {
-        async createComment (comment: CommentsDB): Promise<InsertedObject> {
+        async createComment (comment: CommentsDbModel): Promise<InsertedObject> {
                 return await commentsCollection.insertOne(comment)
         },
         async updateComment (id: string, body: CommentViewModel): Promise<UpdatedObject> {

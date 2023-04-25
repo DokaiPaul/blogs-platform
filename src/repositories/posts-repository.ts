@@ -3,8 +3,9 @@ import {client} from "../database/mongo-db";
 import {ObjectId} from "mongodb";
 import {DeletedObject, InsertedObject, UpdatedObject} from "../models/additional-types/mongo-db-types";
 import {PostsType} from "../models/view-models/posts-view-model";
+import {PostsDbModel} from "../models/mongo-db-models/posts-db-model";
 
-const postCollection = client.db('bloggers-platform').collection<PostsType>('posts')
+const postCollection = client.db('bloggers-platform').collection<PostsDbModel>('posts')
 export const postsRepository = {
     async findAllPosts (): Promise<PostsType[] | null | undefined> {
 

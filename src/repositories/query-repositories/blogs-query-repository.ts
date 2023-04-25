@@ -6,8 +6,9 @@ import {changeKeyName} from "../../utils/object-operations";
 import {BlogsType} from "../../models/view-models/blogs-view-model";
 import {Paginator} from "../../models/view-models/paginator-view-model";
 import {Sort} from "mongodb";
+import {BlogsDbModel} from "../../models/mongo-db-models/blogs-db-model";
 
-const blogsCollection = client.db('bloggers-platform').collection<BlogsType>('blogs')
+const blogsCollection = client.db('bloggers-platform').collection<BlogsDbModel>('blogs')
 export const blogsQueryRepository = {
     async findBlogs (req: RequestWithQuery<QueryBlogsModel>): Promise<Paginator<BlogsType[]> | null | undefined> {
         const [searchByTerm, sortBy, sortDir, pageNum, pageSize] = processQuery(req.query);
@@ -28,7 +29,7 @@ export const blogsQueryRepository = {
 
         blogs.forEach(b => changeKeyName(b, '_id', 'id'))
 
-        const totalMatchedPosts = await blogsCollection.find(filter).count()
+        const totalMatchedPosts = await blogsCollection.countDocuments(filter)
         const totalPages = Math.ceil(totalMatchedPosts / pageSize)
 
         return {

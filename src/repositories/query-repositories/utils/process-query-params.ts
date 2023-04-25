@@ -1,10 +1,9 @@
 import {QueryBlogsModel} from "../../../models/query-models/query-blogs-model";
 import {QueryPostsModel} from "../../../models/query-models/query-posts-model";
 import {BlogsType} from "../../../models/view-models/blogs-view-model";
-import {ObjectId} from "mongodb";
 import {PostsType} from "../../../models/view-models/posts-view-model";
 import {QueryUsersModel} from "../../../models/query-models/query-users-model";
-import {UsersType} from "../../../models/view-models/users-view-model";
+import {UsersViewModel} from "../../../models/view-models/users-view-model";
 
 export const processQuery = (q: QueryBlogsModel) => {
     let searchByTerm = q.searchNameTerm ?? null
@@ -16,7 +15,6 @@ export const processQuery = (q: QueryBlogsModel) => {
     const validBlog: BlogsType =
         {
             id: 'string',
-            _id: new ObjectId('643af7147df5b9a278d8a3a8'),
             name: 'string',
             description: 'string',
             websiteUrl: 'string',
@@ -46,7 +44,6 @@ export const parsePostsQuery = (q: QueryPostsModel) => {
     const validBlog: PostsType =
         {
             id: 'string',
-            _id: new ObjectId('643af7147df5b9a278d8a3a8'),
             title: 'string',
             shortDescription: 'string',
             content: 'string',
@@ -76,10 +73,9 @@ export const parseUsersQuery = (q: QueryUsersModel) => {
     let searchLoginTerm = q.searchLoginTerm ?? null
     let searchEmailTerm = q.searchEmailTerm ?? null
 
-    const validBlog: UsersType =
+    const validBlog: UsersViewModel =
         {
             id: 'string',
-            _id: new ObjectId('643af7147df5b9a278d8a3a8'),
             login: 'string',
             email: 'string',
             createdAt: 'string',

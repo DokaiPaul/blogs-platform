@@ -6,8 +6,9 @@ import {changeKeyName} from "../../utils/object-operations";
 import {PostsType} from "../../models/view-models/posts-view-model";
 import {Paginator} from "../../models/view-models/paginator-view-model";
 import {Sort} from "mongodb";
+import {PostsDbModel} from "../../models/mongo-db-models/posts-db-model";
 
-const postCollection = client.db('bloggers-platform').collection<PostsType>('posts')
+const postCollection = client.db('bloggers-platform').collection<PostsDbModel>('posts')
 export const postsQueryRepository = {
     async findPosts (req: RequestWithQuery<QueryPostsModel>): Promise<Paginator<PostsType[]> | null | undefined> {
         const [sortBy, sortDir, pageNum, pageSize] = parsePostsQuery(req.query);
@@ -25,7 +26,7 @@ export const postsQueryRepository = {
 
         posts.forEach(p => changeKeyName(p, '_id','id'))
 
-        const totalMatchedPosts = await postCollection.find(filter).count()
+        const totalMatchedPosts = await postCollection.countDocuments(filter)
         const totalPages = Math.ceil(totalMatchedPosts / pageSize)
 
         return {
@@ -41,8 +42,9 @@ export const postsQueryRepository = {
 
         let posts: PostsType[] | null;
         let sort = {[sortBy]: sortDir} as Sort
+        const filter = {blogId: req.params.id}
 
-        posts = await postCollection.find({blogId: req.params.id})
+        posts = await postCollection.find(filter)
             .sort(sort)
             .limit(pageSize)
             .skip((pageNum - 1) * pageSize)
@@ -52,7 +54,7 @@ export const postsQueryRepository = {
 
         posts.forEach(p => changeKeyName(p, '_id','id'))
 
-        const totalMatchedPosts = await postCollection.find({blogId: req.params.id}).count()
+        const totalMatchedPosts = await postCollection.countDocuments(filter)
         const totalPages = Math.ceil(totalMatchedPosts / pageSize)
 
         return {

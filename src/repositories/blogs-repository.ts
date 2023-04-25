@@ -3,8 +3,9 @@ import {client} from "../database/mongo-db";
 import {ObjectId} from "mongodb";
 import {DeletedObject, InsertedObject, UpdatedObject} from "../models/additional-types/mongo-db-types";
 import {BlogsType} from "../models/view-models/blogs-view-model";
+import {BlogsDbModel} from "../models/mongo-db-models/blogs-db-model";
 
-const blogsCollection = client.db('bloggers-platform').collection<BlogsType>('blogs')
+const blogsCollection = client.db('bloggers-platform').collection<BlogsDbModel>('blogs')
 export const blogsRepository = {
     async findAllBlogs (): Promise<BlogsType[] | null | undefined> {
 
@@ -28,6 +29,6 @@ export const blogsRepository = {
     },
     async deleteBlog (id: string): Promise<DeletedObject> {
 
-        return  await blogsCollection.deleteOne({_id: new ObjectId(id)})
+        return await blogsCollection.deleteOne({_id: new ObjectId(id)})
     }
 }

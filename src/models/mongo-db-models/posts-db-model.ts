@@ -1,7 +1,7 @@
 import {ObjectId} from "mongodb";
 
-export type PostsType = {
-    id?: string,
+export type PostsDbModel = {
+    _id?: ObjectId,
     title: string,
     shortDescription: string,
     content: string,

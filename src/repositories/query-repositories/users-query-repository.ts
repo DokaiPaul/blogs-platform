@@ -1,17 +1,18 @@
 import {client} from "../../database/mongo-db";
-import {UsersType} from "../../models/view-models/users-view-model";
+import {MeViewModel, UsersViewModel} from "../../models/view-models/users-view-model";
 import {QueryUsersModel} from "../../models/query-models/query-users-model";
 import {parseUsersQuery} from "./utils/process-query-params";
 import {ObjectId, Sort} from "mongodb";
 import {changeKeyName} from "../../utils/object-operations";
 import {Paginator} from "../../models/view-models/paginator-view-model";
-import {CreateNewUser} from "../../models/additional-types/mongo-db-types";
+import {UserDbModel} from "../../models/mongo-db-models/users-db-model";
 
 
-const usersCollection =  client.db('bloggers-platform').collection<CreateNewUser>('users')
+
+const usersCollection =  client.db('bloggers-platform').collection<UserDbModel>('users')
 
 export const usersQueryRepository = {
-    async findUsers (query: QueryUsersModel): Promise<Paginator<UsersType[]>> {
+    async findUsers (query: QueryUsersModel): Promise<Paginator<UsersViewModel[]>> {
         const [searchLoginTerm, searchEmailTerm, sortBy, sortDir, pageNum, pageSize] = parseUsersQuery(query)
         let filter = {}
         let sort = {[sortBy]: sortDir} as Sort
@@ -20,7 +21,7 @@ export const usersQueryRepository = {
         if(searchLoginTerm) filter = {login: {$regex: searchLoginTerm, $options: 'i'}}
         if(searchEmailTerm && searchLoginTerm) filter = {$or: [{login: {$regex: searchLoginTerm, $options: 'i'}}, {email: {$regex: searchEmailTerm, $options: 'i'}}]}
 
-        const users = await usersCollection.find(filter)
+        const users: UsersViewModel[] = await usersCollection.find(filter)
             .sort(sort)
             .limit(pageSize)
             .skip((pageNum - 1) * pageSize)
@@ -28,9 +29,8 @@ export const usersQueryRepository = {
 
         users.forEach(b => changeKeyName(b, '_id', 'id'))
         users.map(u => {
-            // @ts-ignore
+
             delete u.passwordSalt
-            // @ts-ignore
             delete u.passwordHash
         })
 
@@ -45,7 +45,7 @@ export const usersQueryRepository = {
             items: users
         };
     },
-    async findUserById(id: string): Promise<{ email: string; login: string; userId: string } | null> {
+    async findUserById(id: string): Promise<MeViewModel | null> {
         const user = await usersCollection.findOne({_id: new ObjectId(id)})
 
         if(!user) return null

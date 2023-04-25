@@ -1,16 +1,16 @@
 import {client} from "../database/mongo-db";
-import {UsersType} from "../models/view-models/users-view-model";
-import {CreateNewUser, DeletedObject, InsertedObject} from "../models/additional-types/mongo-db-types";
+import {DeletedObject, InsertedObject} from "../models/additional-types/mongo-db-types";
 import {ObjectId} from "mongodb";
+import {UserDbModel} from "../models/mongo-db-models/users-db-model";
 
 
-const usersCollection = client.db('bloggers-platform').collection<CreateNewUser>('users')
+const usersCollection = client.db('bloggers-platform').collection<UserDbModel>('users')
 
 export const usersRepository = {
-    async findByLoginOrEmail(loginOrEmail: string): Promise<CreateNewUser | null> {
+    async findByLoginOrEmail(loginOrEmail: string): Promise<UserDbModel | null> {
         return await usersCollection.findOne({$or: [{email: loginOrEmail}, {login: loginOrEmail}]})
     },
-    async createUser (user: CreateNewUser): Promise<InsertedObject> {
+    async createUser (user: UserDbModel): Promise<InsertedObject> {
         return await usersCollection.insertOne(user)
     },
     async deleteUser (id: string): Promise<DeletedObject> {

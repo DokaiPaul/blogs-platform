@@ -1,17 +1,17 @@
 import {usersRepository} from "../repositories/users-repository";
-import {UsersType} from "../models/view-models/users-view-model";
+import {UsersViewModel} from "../models/view-models/users-view-model";
 import {UserInputType} from "../models/input-models/users-input-models";
 import {changeKeyName} from "../utils/object-operations";
 import bcrypt from 'bcrypt'
-import {CreateNewUser} from "../models/additional-types/mongo-db-types";
 import {LoginInputModel} from "../models/input-models/login-input-model";
+import {UserDbModel} from "../models/mongo-db-models/users-db-model";
 
 export const userService = {
-    async createUser (body: UserInputType): Promise<UsersType> {
+    async createUser (body: UserInputType): Promise<UsersViewModel> {
         const passwordSalt = await bcrypt.genSalt(10)
         const passwordHash = await this._generateHash(body.password, passwordSalt)
 
-        const newUser: CreateNewUser = {
+        const newUser: UserDbModel = {
             login: body.login,
             passwordHash,
             passwordSalt,
@@ -20,26 +20,29 @@ export const userService = {
         }
 
         await usersRepository.createUser(newUser)
-        changeKeyName(newUser, '_id', 'id')
+        const output: UsersViewModel = {...newUser}
+        changeKeyName(output, '_id', 'id')
 
         return {
-            id: newUser.id,
-            login: body.login,
-            email: body.email,
-            createdAt: newUser.createdAt.toISOString()
+            id: output.id,
+            login: output.login,
+            email: output.email,
+            createdAt: output.createdAt.toString()
         }
-    },//@ts-ignore
-    async checkUsersCredentials (body: LoginInputModel): Promise<CreateNewUser | boolean | undefined> {
+    },
+    async checkUsersCredentials (body: LoginInputModel): Promise<UserDbModel | null | undefined> {
         const {loginOrEmail, password} = body;
         const user = await usersRepository.findByLoginOrEmail(loginOrEmail);
-        if(!user) return false;
 
-        const passwordSalt = user.passwordSalt
-        const passwordHash = await this._generateHash(password, passwordSalt)
+        if(user) {
+            const passwordSalt = user.passwordSalt
+            const passwordHash = await this._generateHash(password, passwordSalt)
 
-        if(passwordHash === user.passwordHash) {
-            return user
+            if (passwordHash === user.passwordHash) {
+                return user
+            }
         }
+        return null
     },
     async deleteUser (id: string): Promise<boolean> {
         const result = await usersRepository.deleteUser(id)
