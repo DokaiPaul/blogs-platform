@@ -22,10 +22,11 @@ export const commentsService =
                 }
 
                 await commentsRepository.createComment(newComment)
-                changeKeyName(newComment, '_id', 'id')
-                // @ts-ignore
-                delete newComment.postId
-                return newComment;
+                const output: CommentViewModel = {...newComment}
+                changeKeyName(output, '_id', 'id')
+
+                delete output.postId
+                return output;
 
         },
         async updateComment (req: Request): Promise<string>  {

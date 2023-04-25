@@ -48,8 +48,8 @@ export const commentsQueryRepository =
             const output: CommentViewModel = {...comment}
             delete output.postId
 
-            changeKeyName(comment, '_id', 'id')
+            changeKeyName(output, '_id', 'id')
 
-            return comment
+            return output
         }
     }
