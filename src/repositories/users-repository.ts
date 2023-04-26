@@ -10,6 +10,22 @@ export const usersRepository = {
     async findByLoginOrEmail(loginOrEmail: string): Promise<UserDbModel | null> {
         return await usersCollection.findOne({$or: [{email: loginOrEmail}, {login: loginOrEmail}]})
     },
+    async findByConfirmationCode (code: string): Promise<UserDbModel | null>{
+        const user = await usersCollection.findOne({'emailConfirmation.confirmationCode': code})
+        if(!user) return null
+
+        return user
+    },
+    async updateConfirmationStatus (id: string): Promise<boolean> {
+        const user = await usersCollection.updateOne({_id: new ObjectId(id)}, {$set: {'emailConfirmation.isConfirmed': true}})
+
+        return user.matchedCount === 1
+    },
+    async updateConfirmationCode (id: string, code: string): Promise<boolean> {
+        const user = await usersCollection.updateOne({_id: new ObjectId(id)}, {$set: {'emailConfirmation.confirmationCode': code}})
+
+        return user.matchedCount === 1
+    },
     async createUser (user: UserDbModel): Promise<InsertedObject> {
         return await usersCollection.insertOne(user)
     },

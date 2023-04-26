@@ -7,5 +7,13 @@ export type UserDbModel =
         passwordHash: string,
         passwordSalt: string,
         email: string,
-        createdAt: Date
+        createdAt: Date,
+        emailConfirmation: EmailConfirmationType
     }
+
+    export type EmailConfirmationType =
+        {
+                confirmationCode: string,
+                expirationDate: Date,
+                isConfirmed: boolean
+        }

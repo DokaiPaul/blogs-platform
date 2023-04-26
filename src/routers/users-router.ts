@@ -5,7 +5,6 @@ import {checkErrors} from "../middlewares/check-errors";
 import {RequestWithQuery} from "../models/request-types";
 import {QueryUsersModel} from "../models/query-models/query-users-model";
 import {userService} from "../domain/users-service";
-import {UsersViewModel} from "../models/view-models/users-view-model";
 import {usersBodyValidationMiddleware} from "../middlewares/body-validation/body-validation-middleware";
 import {param} from "express-validator";
 
@@ -19,7 +18,7 @@ usersRouter.get('/', adminAuthMiddleware, checkErrors,
 
 usersRouter.post('/', adminAuthMiddleware, usersBodyValidationMiddleware, checkErrors,
     async (req: Request, res: Response) => {
-        const user: UsersViewModel = await userService.createUser(req.body)
+        const user = await userService.createUser(req.body)
         res.status(201).json(user)
 })
 

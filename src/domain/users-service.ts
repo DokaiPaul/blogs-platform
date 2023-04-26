@@ -4,27 +4,74 @@ import {UserInputType} from "../models/input-models/users-input-models";
 import bcrypt from 'bcrypt'
 import {LoginInputModel} from "../models/input-models/login-input-model";
 import {UserDbModel} from "../models/mongo-db-models/users-db-model";
+import {v4 as uuidv4} from 'uuid'
+import add from 'date-fns/add'
+import {ObjectId} from "mongodb";
+import {emailsManager} from "../managers/email-sender-manager";
 
 export const userService = {
-    async createUser (body: UserInputType): Promise<UsersViewModel> {
+    async createUser (body: UserInputType): Promise<UsersViewModel | null> {
         const passwordSalt = await bcrypt.genSalt(10)
         const passwordHash = await this._generateHash(body.password, passwordSalt)
 
         const newUser: UserDbModel = {
+            _id: new ObjectId(),
             login: body.login,
             passwordHash,
             passwordSalt,
             email: body.email,
-            createdAt: new Date()
+            createdAt: new Date(),
+            emailConfirmation: {
+                confirmationCode: uuidv4(),
+                expirationDate: add(new Date(), {minutes: 30}),
+                isConfirmed: false
+            }
         }
 
         await usersRepository.createUser(newUser)
+
+        try {
+            await emailsManager.sendEmailConfirmationCode(newUser, newUser.emailConfirmation.confirmationCode)
+        } catch (e) {
+            console.error(e)
+            await usersRepository.deleteUser(newUser._id!.toString())
+            return null
+        }
 
         return {
             id: newUser._id!.toString(),
             login: newUser.login,
             email: newUser.email,
             createdAt: newUser.createdAt.toISOString()
+        }
+    },
+    async confirmEmail (code: string): Promise<boolean> {
+
+        const user = await usersRepository.findByConfirmationCode(code)
+
+        if(!user) return false
+        if(user.emailConfirmation.isConfirmed) return false
+        if(user.emailConfirmation.confirmationCode !== code) return false
+        if(user.emailConfirmation.expirationDate < new Date()) return false
+
+        const result = await usersRepository.updateConfirmationStatus(user._id!.toString())
+
+        return result
+
+    },
+    async resendConfirmation(email: string): Promise<boolean> {
+        const user = await usersRepository.findByLoginOrEmail(email)
+        if(!user) return false
+        if(user.emailConfirmation.isConfirmed) return false
+        const confirmationCode = uuidv4()
+
+        try {
+            await usersRepository.updateConfirmationCode(user._id!.toString(), confirmationCode)
+            await emailsManager.sendEmailConfirmationCode(user, confirmationCode)
+            return true
+        } catch (e) {
+            console.error(e)
+            return false
         }
     },
     async checkUsersCredentials (body: LoginInputModel): Promise<UserDbModel | null | undefined> {
