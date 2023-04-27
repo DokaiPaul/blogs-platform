@@ -27,7 +27,6 @@ authRouter.get('/me', authMiddleware, async (req: Request, res: Response) => {
     res.status(200).json(person)
 })
 
-//todo add email notifications
 authRouter.post('/registration',
     usersBodyValidationMiddleware,
     checkErrors,
@@ -38,6 +37,18 @@ authRouter.post('/registration',
             res.sendStatus(400)
             return
         }
+
+        if(result === 'email') {
+            res.status(400).json({ errorsMessages: [{ message: 'This email is already taken', field: "email" }] })
+            return
+        }
+
+        if(result === 'login') {
+            res.status(400).json({ errorsMessages: [{ message: 'This login is already taken', field: "login" }] })
+            return
+        }
+
+
         res.sendStatus(204)
 })
 
@@ -48,7 +59,7 @@ authRouter.post('/registration-confirmation',
 
         const result = await userService.confirmEmail(req.body.code)
         if(!result) {
-            res.sendStatus(400)
+            res.status(400).send({ errorsMessages: [{ message: 'Some issue with code', field: "code" }] })
             return
         }
         res.sendStatus(204)
@@ -62,7 +73,7 @@ authRouter.post('/registration-email-resending',
 
         const result = await userService.resendConfirmation(req.body.email)
         if(!result) {
-            res.sendStatus(400)
+            res.status(400).send({ errorsMessages: [{ message: 'Email is already confirmed', field: "email" }] })
             return
         }
         res.sendStatus(204)

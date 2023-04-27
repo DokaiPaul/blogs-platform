@@ -19,6 +19,21 @@ usersRouter.get('/', adminAuthMiddleware, checkErrors,
 usersRouter.post('/', adminAuthMiddleware, usersBodyValidationMiddleware, checkErrors,
     async (req: Request, res: Response) => {
         const user = await userService.createUser(req.body)
+        if(!user) {
+            res.sendStatus(400)
+            return
+        }
+
+        if(user === 'email') {
+            res.status(400).json({ errorsMessages: [{ message: 'This email is already taken', field: "email" }] })
+            return
+        }
+
+        if(user === 'login') {
+            res.status(400).json({ errorsMessages: [{ message: 'This login is already taken', field: "login" }] })
+            return
+        }
+
         res.status(201).json(user)
 })
 

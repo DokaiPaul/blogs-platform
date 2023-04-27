@@ -10,6 +10,12 @@ export const usersRepository = {
     async findByLoginOrEmail(loginOrEmail: string): Promise<UserDbModel | null> {
         return await usersCollection.findOne({$or: [{email: loginOrEmail}, {login: loginOrEmail}]})
     },
+    async findByLogin(login: string) {
+        return await usersCollection.findOne({login: login})
+    },
+    async findByEmail(email: string) {
+        return await usersCollection.findOne({email: email})
+    },
     async findByConfirmationCode (code: string): Promise<UserDbModel | null>{
         const user = await usersCollection.findOne({'emailConfirmation.confirmationCode': code})
         if(!user) return null

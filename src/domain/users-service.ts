@@ -10,7 +10,13 @@ import {ObjectId} from "mongodb";
 import {emailsManager} from "../managers/email-sender-manager";
 
 export const userService = {
-    async createUser (body: UserInputType): Promise<UsersViewModel | null> {
+    async createUser (body: UserInputType): Promise<UsersViewModel | null | string> {
+        const isLoginAlreadyExists = await usersRepository.findByLogin(body.login)
+        if(!isLoginAlreadyExists) return 'login'
+
+        const isEmailAlreadyExist = await usersRepository.findByEmail(body.email)
+        if(!isEmailAlreadyExist) return 'email'
+
         const passwordSalt = await bcrypt.genSalt(10)
         const passwordHash = await this._generateHash(body.password, passwordSalt)
 
