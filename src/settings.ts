@@ -6,11 +6,13 @@ import {postsRouter} from "./routers/posts-router";
 import {usersRouter} from "./routers/users-router";
 import {authRouter} from "./routers/auth-router";
 import {commentsRouter} from "./routers/comments-router";
+import cookieParser from "cookie-parser";
 
 export const app = express();
 
 const jsonBodyMiddleware = express.json();
 app.use(jsonBodyMiddleware);
+app.use(cookieParser());
 
 app.get('/', (req: Request, res: Response) => {
     res.send('Hello! Checkout content by adding "/videos", "/posts" or "/blogs" to the current URL')

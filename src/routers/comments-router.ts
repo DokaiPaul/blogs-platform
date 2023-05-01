@@ -5,7 +5,6 @@ import {authMiddleware} from "../middlewares/autorization-middleware";
 import {checkErrors} from "../middlewares/check-errors";
 import {param} from "express-validator";
 import {commentBodyValidationMiddleware} from "../middlewares/body-validation/body-validation-middleware";
-import {commentsRepository} from "../repositories/comments-repository";
 
 export const commentsRouter = Router({})
 
@@ -26,7 +25,7 @@ commentsRouter.put('/:id',
     commentBodyValidationMiddleware,
     checkErrors,
     async (req: Request, res: Response) => {
-        // @ts-ignore
+
     const result = await commentsService.updateComment(req)
 
     if (result === 'wrong id') {

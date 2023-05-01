@@ -9,11 +9,13 @@ import {jwtService} from "../application/jwt-service";
 import {usersBodyValidationMiddleware} from "../middlewares/body-validation/body-validation-middleware";
 
 export const authRouter = Router({})
-
 authRouter.post('/login', body('loginOrEmail').isString(), passwordValidation, checkErrors, async (req: Request, res: Response) => {
     const user = await userService.checkUsersCredentials(req.body)
     if(user) {
-        const token = await jwtService.createJWT(user)
+        const token = await jwtService.createAccessJWT(user._id!.toString())
+        const refreshToken = await jwtService.createRefreshJWT(user._id!.toString())
+
+        res.cookie('refreshToken', refreshToken, {httpOnly: true, secure: true})
         res.status(200).json({"accessToken": token})
         return
     }
@@ -21,7 +23,10 @@ authRouter.post('/login', body('loginOrEmail').isString(), passwordValidation, c
 })
 
 authRouter.get('/me', authMiddleware, async (req: Request, res: Response) => {
-    //@ts-ignore
+    if(!req.userId) {
+        res.sendStatus(404)
+        return
+    }
     const person = await usersQueryRepository.findUserById(req.userId)
 
     res.status(200).json(person)
@@ -32,24 +37,24 @@ authRouter.post('/registration',
     checkErrors,
     async (req: Request, res: Response) => {
 
-        const result = await userService.createUser(req.body)
-        if(!result) {
-            res.sendStatus(400)
-            return
-        }
+            const result = await userService.createUser(req.body)
+            if(!result) {
+                res.sendStatus(400)
+                return
+            }
 
-        if(result === 'email') {
-            res.status(400).json({ errorsMessages: [{ message: 'This email is already taken', field: "email" }] })
-            return
-        }
+            if(result === 'email') {
+                res.status(400).json({ errorsMessages: [{ message: 'This email is already taken', field: "email" }] })
+                return
+            }
 
-        if(result === 'login') {
-            res.status(400).json({ errorsMessages: [{ message: 'This login is already taken', field: "login" }] })
-            return
-        }
+            if(result === 'login') {
+                res.status(400).json({ errorsMessages: [{ message: 'This login is already taken', field: "login" }] })
+                return
+            }
 
 
-        res.sendStatus(204)
+            res.sendStatus(204)
 })
 
 authRouter.post('/registration-confirmation',
@@ -77,4 +82,33 @@ authRouter.post('/registration-email-resending',
             return
         }
         res.sendStatus(204)
+})
+
+authRouter.post('/refresh-token', async (req: Request, res: Response) => {
+    const refreshToken = req.cookies.refreshToken
+    const result = await jwtService.verifyRefreshJWT(refreshToken)
+
+    if(!result) {
+        res.sendStatus(401)
+        return
+    }
+    await jwtService.revokeRefreshJWT(refreshToken)
+
+    const accessToken = await jwtService.createAccessJWT(result)
+    const newRefreshToken = await jwtService.createRefreshJWT(result)
+
+    res.cookie('refreshToken', newRefreshToken, {httpOnly: true, secure: true})
+    res.status(200).json({"accessToken": accessToken})
+})
+
+authRouter.post('/logout', async (req: Request, res: Response) => {
+    const refreshToken = req.cookies.refreshToken
+    const result = await jwtService.verifyRefreshJWT(refreshToken)
+
+    if(!result) {
+        res.sendStatus(401)
+        return
+    }
+    await jwtService.revokeRefreshJWT(refreshToken)
+    res.sendStatus(204)
 })

@@ -8,8 +8,8 @@ import {CommentsDbModel} from "../models/mongo-db-models/comments-db-model";
 
 export const commentsService =
     {
-        async createComment (req: Request): Promise<CommentViewModel> {
-                // @ts-ignore
+        async createComment (req: Request): Promise<CommentViewModel | null> {
+                if(!req.userId) return null
                 const user = await usersQueryRepository.findUserById(req.userId)
                 const newComment: CommentsDbModel = {
                         content: req.body!.content,
@@ -37,7 +37,7 @@ export const commentsService =
             const comment = await commentsQueryRepository.findCommentById(commentsId)
 
             if(!comment) return 'wrong id'
-            // @ts-ignore
+
             if(comment.commentatorInfo.userId !== req.userId) return 'not owner'
 
             comment.content = content
@@ -51,7 +51,7 @@ export const commentsService =
             const comment = await commentsQueryRepository.findCommentById(req.params.id)
 
             if(!comment) return 'wrong id'
-            // @ts-ignore
+
             if(comment.commentatorInfo.userId !== req.userId) return 'not owner'
 
             const result = await commentsRepository.deleteComment(req.params.id)
