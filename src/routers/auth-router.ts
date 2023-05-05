@@ -7,9 +7,11 @@ import {usersQueryRepository} from "../repositories/query-repositories/users-que
 import {authMiddleware} from "../middlewares/autorization-middleware";
 import {jwtService} from "../application/jwt-service";
 import {usersBodyValidationMiddleware} from "../middlewares/body-validation/body-validation-middleware";
+import {checkRateLimit} from "../middlewares/rate-limit-middleware";
 
 export const authRouter = Router({})
-authRouter.post('/login', body('loginOrEmail').isString(), passwordValidation, checkErrors, async (req: Request, res: Response) => {
+
+authRouter.post('/login', checkRateLimit ,body('loginOrEmail').isString(), passwordValidation, checkErrors, async (req: Request, res: Response) => {
     const user = await userService.checkUsersCredentials(req.body)
     if(user) {
         const token = await jwtService.createAccessJWT(user._id!.toString())
@@ -33,6 +35,7 @@ authRouter.get('/me', authMiddleware, async (req: Request, res: Response) => {
 })
 
 authRouter.post('/registration',
+    checkRateLimit,
     usersBodyValidationMiddleware,
     checkErrors,
     async (req: Request, res: Response) => {
@@ -59,6 +62,7 @@ authRouter.post('/registration',
 
 authRouter.post('/registration-confirmation',
     body('code').isString().withMessage('Code should be a string'),
+    checkRateLimit,
     checkErrors,
     async (req: Request, res: Response) => {
 
@@ -84,7 +88,7 @@ authRouter.post('/registration-email-resending',
         res.sendStatus(204)
 })
 
-authRouter.post('/refresh-token', async (req: Request, res: Response) => {
+authRouter.post('/refresh-token', checkRateLimit, async (req: Request, res: Response) => {
     const refreshToken = req.cookies.refreshToken
     const result = await jwtService.verifyRefreshJWT(refreshToken)
 

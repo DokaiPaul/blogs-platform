@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken'
+import jwt, {JwtPayload} from 'jsonwebtoken'
 import {client} from "../database/mongo-db";
 
 const secret = process.env.JWT_SECRET || '123'
@@ -29,7 +29,9 @@ export const jwtService =
             }
         },
         async revokeRefreshJWT(token: string) {
-            return await revokedTokensCollection.insertOne({RefreshJWT: token})
+            const tokenData = jwt.decode(token) as JwtPayload
+            const expDate = tokenData!.exp
+            return await revokedTokensCollection.insertOne({RefreshJWT: token, ExpirationDate: expDate})
         },
         async getUserByIdToken (token: string) {
             try {
