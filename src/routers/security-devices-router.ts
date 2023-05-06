@@ -13,7 +13,7 @@ securityDevicesRouter.get('/', async (req: Request, res: Response) => {
         return
     }
     const deviceData = await activeSessionsService.findDeviceById(result.deviceId)
-    res.send([deviceData])
+    res.send(deviceData)
 })
 
 securityDevicesRouter.delete('/', async (req: Request, res: Response) => {
