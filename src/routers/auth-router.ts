@@ -136,12 +136,13 @@ authRouter.post('/refresh-token', async (req: Request, res: Response) => {
     const parsedToken = await jwtService.parseJWT(updatedRJWT)
     const accessToken = await jwtService.createAccessJWT(result.userId)
 
-    if(!parsedToken.iat) {
+    if(!parsedToken.iat || !parsedToken.exp) {
         res.sendStatus(500)
         return
     }
-
-    await activeSessionsService.updateDevice(parsedToken.deviceId, parsedToken.iat.toLocaleString())
+    const lastUpdateDate = new Date(new Date(0).setUTCSeconds(parsedToken.iat)).toISOString()
+    const expirationDate = new Date(new Date(0).setUTCSeconds(parsedToken.exp)).toISOString()
+    await activeSessionsService.updateDevice(parsedToken.deviceId, lastUpdateDate, expirationDate)
 
     res.cookie('refreshToken', updatedRJWT, {httpOnly: true, secure: true})
     res.status(200).json({"accessToken": accessToken})
