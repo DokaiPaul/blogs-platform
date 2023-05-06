@@ -13,6 +13,6 @@ export const RequestLimitRepository =
             return rateLimitCollection.find(filter).toArray()
         },
         async removeOutdatedRequests (date: Date) {
-            return rateLimitCollection.deleteMany({date: {$lt: subSeconds(date, 10)}})
+            return rateLimitCollection.deleteMany({date: {$lt: subSeconds(date, 20)}})
         }
     }

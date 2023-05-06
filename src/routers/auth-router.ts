@@ -123,7 +123,7 @@ authRouter.post('/registration-email-resending',
         res.sendStatus(204)
 })
 
-authRouter.post('/refresh-token', checkRateLimit, async (req: Request, res: Response) => {
+authRouter.post('/refresh-token', async (req: Request, res: Response) => {
     const refreshToken = req.cookies.refreshToken
     const result = await jwtService.verifyRefreshToken(refreshToken)
 

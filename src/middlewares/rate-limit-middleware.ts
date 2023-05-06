@@ -11,7 +11,7 @@ export const checkRateLimit = async (req: Request, res: Response, next: NextFunc
         return
     }
 
-    await RequestLimitRepository.addRequest({ip, url, date})
+
 
     const result = await RequestLimitRepository.findRequestForIP(ip, url, date)
 
@@ -21,6 +21,6 @@ export const checkRateLimit = async (req: Request, res: Response, next: NextFunc
         res.sendStatus(429)
         return
     }
-
+    await RequestLimitRepository.addRequest({ip, url, date})
     next()
 }
