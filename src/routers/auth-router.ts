@@ -94,7 +94,6 @@ authRouter.post('/registration',
 })
 
 authRouter.post('/registration-confirmation',
-    checkRateLimit,
     body('code').isString().withMessage('Code should be a string'),
     checkRateLimit,
     checkErrors,
