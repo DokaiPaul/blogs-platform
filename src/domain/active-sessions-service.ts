@@ -5,7 +5,7 @@ export const activeSessionsService =
     {
         async findDeviceById(deviceId: string) {
                 const session = await activeSessionsRepository.findDeviceById(deviceId)
-                if(!session) return null
+                if(!session || !session.lastActiveDate) return null
 
                 return {
                         ip: session.ip,

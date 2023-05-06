@@ -40,8 +40,8 @@ authRouter.post('/login', checkRateLimit ,body('loginOrEmail').isString(), passw
             res.sendStatus(500)
             return
         }
-        sessionInfo.tokenExpirationDate = parsedRToken.exp.toString()
-        sessionInfo.lastActiveDate = parsedRToken.iat.toString()
+        sessionInfo.tokenExpirationDate = new Date(new Date(0).setUTCSeconds(parsedRToken.exp)).toISOString()
+        sessionInfo.lastActiveDate = new Date(new Date(0).setUTCSeconds(parsedRToken.iat)).toISOString()
 
         const result = await activeSessionsService.addDevice(sessionInfo)
 

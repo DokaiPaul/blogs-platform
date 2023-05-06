@@ -26,7 +26,7 @@ export const jwtService =
 
                 if(!tok) return null
                 if(!session) return null
-                if(session.lastActiveDate !== tok.iat.toString()) return null
+                if(session.lastActiveDate !== new Date(new Date(0).setUTCSeconds(tok.iat)).toISOString()) return null
 
                 return tok
             } catch (e) {
