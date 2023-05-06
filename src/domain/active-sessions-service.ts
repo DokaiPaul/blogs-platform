@@ -14,6 +14,18 @@ export const activeSessionsService =
                         deviceId: session.deviceId
                 }
         },
+        async findDevicesByUserId(userId: string) {
+                const sessions = await activeSessionsRepository.findDevicesByUserId(userId)
+
+                return sessions.map(v => {
+                        return {
+                                ip: v.ip,
+                                title: v.title,
+                                lastActiveDate: v.lastActiveDate,
+                                deviceId: v.deviceId
+                        }
+                })
+        },
         async addDevice (newDevice: ActiveSessionModel) {
                return activeSessionsRepository.addDevice(newDevice)
         },

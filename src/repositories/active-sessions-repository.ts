@@ -5,6 +5,9 @@ const activeSessionsCollection = client.db('bloggers-platform').collection<Activ
 
 export const activeSessionsRepository =
     {
+        async findDevicesByUserId(userId: string) {
+            return activeSessionsCollection.find({userId: userId}) .toArray()
+        },
         async findDeviceById (deviceId: string) {
             return activeSessionsCollection.findOne({deviceId: deviceId})
         },

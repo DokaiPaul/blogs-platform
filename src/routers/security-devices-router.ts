@@ -12,7 +12,7 @@ securityDevicesRouter.get('/', async (req: Request, res: Response) => {
         res.sendStatus(401)
         return
     }
-    const deviceData = await activeSessionsService.findDeviceById(result.deviceId)
+    const deviceData = await activeSessionsService.findDevicesByUserId(result.userId)
     res.send(deviceData)
 })
 
