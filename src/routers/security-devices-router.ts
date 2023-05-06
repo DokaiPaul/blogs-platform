@@ -35,7 +35,7 @@ securityDevicesRouter.delete('/:id', param('id').isMongoId(), async (req: Reques
         return
     }
 
-    const isDeleted = await activeSessionsService.deleteDeviceById(result.deviceId, result.userId)
+    const isDeleted = await activeSessionsService.deleteDeviceById(req.params.id, result.userId)
 
     if(isDeleted === 'not found') {
         res.sendStatus(404)

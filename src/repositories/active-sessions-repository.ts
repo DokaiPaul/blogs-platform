@@ -6,21 +6,21 @@ const activeSessionsCollection = client.db('bloggers-platform').collection<Activ
 export const activeSessionsRepository =
     {
         async findDevicesByUserId(userId: string) {
-            return activeSessionsCollection.find({userId: userId}) .toArray()
+            return await activeSessionsCollection.find({userId: userId}) .toArray()
         },
-        async findDeviceById (deviceId: string) {
-            return activeSessionsCollection.findOne({deviceId: deviceId})
+        async findDeviceById (deviceId: string): Promise<ActiveSessionModel | null> {
+            return await activeSessionsCollection.findOne({deviceId: deviceId})
         },
         async addDevice (newDevice: ActiveSessionModel) {
-            return activeSessionsCollection.insertOne(newDevice)
+            return await activeSessionsCollection.insertOne(newDevice)
         },
         async updateDevice (deviceId: string, lastActiveDate: string) {
-            return activeSessionsCollection.updateOne({deviceId: deviceId}, {$set: {lastActiveDate: lastActiveDate}})
+            return await activeSessionsCollection.updateOne({deviceId: deviceId}, {$set: {lastActiveDate: lastActiveDate}})
         },
         async deleteDeviceById (deviceId: string) {
-            return activeSessionsCollection.deleteOne({deviceId: deviceId})
+            return await activeSessionsCollection.deleteOne({deviceId: deviceId})
         },
         async deleteAllOtherDevices (deviceId: string, userId: string) {
-            return activeSessionsCollection.deleteMany({userId: userId, deviceId: {$ne: deviceId}})
+            return await activeSessionsCollection.deleteMany({userId: userId, deviceId: {$ne: deviceId}})
         }
     }
