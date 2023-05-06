@@ -94,6 +94,7 @@ authRouter.post('/registration',
 })
 
 authRouter.post('/registration-confirmation',
+    checkRateLimit,
     body('code').isString().withMessage('Code should be a string'),
     checkRateLimit,
     checkErrors,
@@ -108,6 +109,7 @@ authRouter.post('/registration-confirmation',
 })
 
 authRouter.post('/registration-email-resending',
+    checkRateLimit,
     body('email').isString().withMessage('Your email should be a string').bail()
         .matches(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/).withMessage('Your email is incorrect'),
     checkErrors,
