@@ -7,13 +7,14 @@ import {usersRouter} from "./routers/users-router";
 import {authRouter} from "./routers/auth-router";
 import {commentsRouter} from "./routers/comments-router";
 import cookieParser from "cookie-parser";
-import {securityDevicesRouter} from "./routers/security-devices";
+import {securityDevicesRouter} from "./routers/security-devices-router";
 
 export const app = express();
 
 const jsonBodyMiddleware = express.json();
 app.use(jsonBodyMiddleware);
 app.use(cookieParser());
+app.set('trust proxy', true)
 
 app.get('/', (req: Request, res: Response) => {
     res.send('Hello! Checkout content by adding "/videos", "/posts" or "/blogs" to the current URL')

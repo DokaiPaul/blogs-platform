@@ -11,5 +11,8 @@ export const RequestLimitRepository =
         async findRequestForIP (ip: string, url: string, date: Date) {
             const filter = {ip: ip, url: url, date: {$gte: subSeconds(date, 10)}}
             return rateLimitCollection.find(filter).toArray()
+        },
+        async removeOutdatedRequests (date: Date) {
+            return rateLimitCollection.deleteMany({date: {$lt: subSeconds(date, 10)}})
         }
     }

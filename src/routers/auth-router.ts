@@ -8,6 +8,9 @@ import {authMiddleware} from "../middlewares/autorization-middleware";
 import {jwtService} from "../application/jwt-service";
 import {usersBodyValidationMiddleware} from "../middlewares/body-validation/body-validation-middleware";
 import {checkRateLimit} from "../middlewares/rate-limit-middleware";
+import {v4 as uuidv4} from "uuid";
+import {ActiveSessionModel} from "../models/mongo-db-models/active-session-model";
+import {activeSessionsService} from "../domain/active-sessions-service";
 
 export const authRouter = Router({})
 
@@ -15,7 +18,37 @@ authRouter.post('/login', checkRateLimit ,body('loginOrEmail').isString(), passw
     const user = await userService.checkUsersCredentials(req.body)
     if(user) {
         const token = await jwtService.createAccessJWT(user._id!.toString())
-        const refreshToken = await jwtService.createRefreshJWT(user._id!.toString())
+        const ip = req.headers['x-forwarded-for'] as string || req.socket.remoteAddress
+
+        if(!user._id || !req.headers['user-agent'] || !ip) {
+            res.sendStatus(400)
+            return
+        }
+
+
+        const sessionInfo: ActiveSessionModel = {
+            deviceId: uuidv4(),
+            userId: user._id.toString(),
+            ip,
+            title: req.headers['user-agent']
+        }
+
+        const refreshToken = await jwtService.createRefreshJWT(sessionInfo.deviceId, sessionInfo.userId)
+        const parsedRToken = await jwtService.parseJWT(refreshToken)
+
+        if(!parsedRToken.exp || !parsedRToken.iat) {
+            res.sendStatus(500)
+            return
+        }
+        sessionInfo.tokenExpirationDate = parsedRToken.exp.toString()
+        sessionInfo.lastActiveDate = parsedRToken.iat.toString()
+
+        const result = await activeSessionsService.addDevice(sessionInfo)
+
+        if(!result) {
+            res.sendStatus(500)
+            return
+        }
 
         res.cookie('refreshToken', refreshToken, {httpOnly: true, secure: true})
         res.status(200).json({"accessToken": token})
@@ -90,29 +123,36 @@ authRouter.post('/registration-email-resending',
 
 authRouter.post('/refresh-token', checkRateLimit, async (req: Request, res: Response) => {
     const refreshToken = req.cookies.refreshToken
-    const result = await jwtService.verifyRefreshJWT(refreshToken)
+    const result = await jwtService.verifyRefreshToken(refreshToken)
 
     if(!result) {
         res.sendStatus(401)
         return
     }
-    await jwtService.revokeRefreshJWT(refreshToken)
 
-    const accessToken = await jwtService.createAccessJWT(result)
-    const newRefreshToken = await jwtService.createRefreshJWT(result)
+    const updatedRJWT = await jwtService.createRefreshJWT(result.deviceId, result.userId)
+    const parsedToken = await jwtService.parseJWT(updatedRJWT)
+    const accessToken = await jwtService.createAccessJWT(result.userId)
 
-    res.cookie('refreshToken', newRefreshToken, {httpOnly: true, secure: true})
+    if(!parsedToken.iat) {
+        res.sendStatus(500)
+        return
+    }
+
+    await activeSessionsService.updateDevice(parsedToken.deviceId, parsedToken.iat.toLocaleString())
+
+    res.cookie('refreshToken', updatedRJWT, {httpOnly: true, secure: true})
     res.status(200).json({"accessToken": accessToken})
 })
 
 authRouter.post('/logout', async (req: Request, res: Response) => {
     const refreshToken = req.cookies.refreshToken
-    const result = await jwtService.verifyRefreshJWT(refreshToken)
+    const result = await jwtService.verifyRefreshToken(refreshToken)
 
     if(!result) {
         res.sendStatus(401)
         return
     }
-    await jwtService.revokeRefreshJWT(refreshToken)
+    await activeSessionsService.deleteDeviceById(result.deviceId, result.userId)
     res.sendStatus(204)
 })
