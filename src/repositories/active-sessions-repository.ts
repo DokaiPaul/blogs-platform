@@ -14,8 +14,8 @@ export const activeSessionsRepository =
         async addDevice (newDevice: ActiveSessionModel) {
             return await activeSessionsCollection.insertOne(newDevice)
         },
-        async updateDevice (deviceId: string, lastActiveDate: string) {
-            return await activeSessionsCollection.updateOne({deviceId: deviceId}, {$set: {lastActiveDate: lastActiveDate}})
+        async updateDevice (deviceId: string, lastActiveDate: string, expDate: string) {
+            return await activeSessionsCollection.updateOne({deviceId: deviceId}, {$set: {lastActiveDate: lastActiveDate, tokenExpirationDate: expDate}})
         },
         async deleteDeviceById (deviceId: string) {
             return await activeSessionsCollection.deleteOne({deviceId: deviceId})

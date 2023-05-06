@@ -29,8 +29,8 @@ export const activeSessionsService =
         async addDevice (newDevice: ActiveSessionModel) {
                return activeSessionsRepository.addDevice(newDevice)
         },
-        async updateDevice (deviceId: string, lastActiveDate: string) {
-                await activeSessionsRepository.updateDevice(deviceId, lastActiveDate)
+        async updateDevice (deviceId: string, lastActiveDate: string, expirationDate: string) {
+                await activeSessionsRepository.updateDevice(deviceId, lastActiveDate, expirationDate)
         },
         async deleteDeviceById (deviceId: string, userId: string): Promise<string | null> {
                 const isDeviceExist = await activeSessionsRepository.findDeviceById(deviceId)
