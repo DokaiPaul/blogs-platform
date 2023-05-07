@@ -17,14 +17,12 @@ export const authRouter = Router({})
 authRouter.post('/login', checkRateLimit ,body('loginOrEmail').isString(), passwordValidation, checkErrors, async (req: Request, res: Response) => {
     const user = await userService.checkUsersCredentials(req.body)
     if(user) {
-        const token = await jwtService.createAccessJWT(user._id!.toString())
         const ip = req.headers['x-forwarded-for'] as string || req.socket.remoteAddress
 
         if(!user._id || !req.headers['user-agent'] || !ip) {
             res.sendStatus(400)
             return
         }
-
 
         const sessionInfo: ActiveSessionModel = {
             deviceId: uuidv4(),
@@ -33,16 +31,6 @@ authRouter.post('/login', checkRateLimit ,body('loginOrEmail').isString(), passw
             title: req.headers['user-agent']
         }
 
-        const refreshToken = await jwtService.createRefreshJWT(sessionInfo.deviceId, sessionInfo.userId)
-        const parsedRToken = await jwtService.parseJWT(refreshToken)
-
-        if(!parsedRToken.exp || !parsedRToken.iat) {
-            res.sendStatus(500)
-            return
-        }
-        sessionInfo.tokenExpirationDate = new Date(new Date(0).setUTCSeconds(parsedRToken.exp)).toISOString()
-        sessionInfo.lastActiveDate = new Date(new Date(0).setUTCSeconds(parsedRToken.iat)).toISOString()
-
         const result = await activeSessionsService.addDevice(sessionInfo)
 
         if(!result) {
@@ -50,8 +38,8 @@ authRouter.post('/login', checkRateLimit ,body('loginOrEmail').isString(), passw
             return
         }
 
-        res.cookie('refreshToken', refreshToken, {httpOnly: true, secure: true})
-        res.status(200).json({"accessToken": token})
+        res.cookie('refreshToken', result.refreshToken, {httpOnly: true, secure: true})
+        res.status(200).json({"accessToken": result.accessToken})
         return
     }
     res.sendStatus(401)
@@ -131,20 +119,15 @@ authRouter.post('/refresh-token', async (req: Request, res: Response) => {
         return
     }
 
-    const updatedRJWT = await jwtService.createRefreshJWT(result.deviceId, result.userId)
-    const parsedToken = await jwtService.parseJWT(updatedRJWT)
-    const accessToken = await jwtService.createAccessJWT(result.userId)
+    const isUpdated = await activeSessionsService.updateDevice(refreshToken)
 
-    if(!parsedToken.iat || !parsedToken.exp) {
+    if(!isUpdated) {
         res.sendStatus(500)
         return
     }
-    const lastUpdateDate = new Date(new Date(0).setUTCSeconds(parsedToken.iat)).toISOString()
-    const expirationDate = new Date(new Date(0).setUTCSeconds(parsedToken.exp)).toISOString()
-    await activeSessionsService.updateDevice(parsedToken.deviceId, lastUpdateDate, expirationDate)
 
-    res.cookie('refreshToken', updatedRJWT, {httpOnly: true, secure: true})
-    res.status(200).json({"accessToken": accessToken})
+    res.cookie('refreshToken', isUpdated.newRefreshToken, {httpOnly: true, secure: true})
+    res.status(200).json({"accessToken": isUpdated.newAccessToken})
 })
 
 authRouter.post('/logout', async (req: Request, res: Response) => {

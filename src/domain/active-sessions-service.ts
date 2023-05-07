@@ -1,5 +1,6 @@
 import {ActiveSessionModel} from "../models/mongo-db-models/active-session-model";
 import {activeSessionsRepository} from "../repositories/active-sessions-repository";
+import {jwtService} from "../application/jwt-service";
 
 export const activeSessionsService =
     {
@@ -26,11 +27,39 @@ export const activeSessionsService =
                         }
                 })
         },
-        async addDevice (newDevice: ActiveSessionModel) {
-               return activeSessionsRepository.addDevice(newDevice)
+        async addDevice (sessionInfo: ActiveSessionModel) {
+                const accessToken = await jwtService.createAccessJWT(sessionInfo.userId)
+                const refreshToken = await jwtService.createRefreshJWT(sessionInfo.deviceId, sessionInfo.userId)
+                const parsedRToken = await jwtService.parseJWT(refreshToken)
+
+                if(!parsedRToken.exp || !parsedRToken.iat) return null
+
+                sessionInfo.tokenExpirationDate = new Date(new Date(0).setUTCSeconds(parsedRToken.exp)).toISOString()
+                sessionInfo.lastActiveDate = new Date(new Date(0).setUTCSeconds(parsedRToken.iat)).toISOString()
+
+                const result = await activeSessionsRepository.addDevice(sessionInfo)
+
+                return {accessToken, refreshToken, result}
         },
-        async updateDevice (deviceId: string, lastActiveDate: string, expirationDate: string) {
-                await activeSessionsRepository.updateDevice(deviceId, lastActiveDate, expirationDate)
+        async updateDevice (oldToken: string): Promise<{newRefreshToken: string, newAccessToken: string} | null> {
+                const parsedOldToken = await jwtService.parseJWT(oldToken)
+                const updatedRJWT = await jwtService.createRefreshJWT(parsedOldToken.deviceId, parsedOldToken.userId)
+
+                const parsedUpdatedToken = await jwtService.parseJWT(updatedRJWT)
+                const accessToken = await jwtService.createAccessJWT(parsedOldToken.userId)
+
+                if(!parsedUpdatedToken.iat || !parsedUpdatedToken.exp) return null
+
+                const lastUpdateDate = new Date(new Date(0).setUTCSeconds(parsedUpdatedToken.iat)).toISOString()
+                const expirationDate = new Date(new Date(0).setUTCSeconds(parsedUpdatedToken.exp)).toISOString()
+
+                const result = await activeSessionsRepository.updateDevice(parsedOldToken.deviceId, lastUpdateDate, expirationDate)
+                if(result.matchedCount !== 1) return null
+
+                return {
+                        newRefreshToken: updatedRJWT,
+                        newAccessToken: accessToken
+                }
         },
         async deleteDeviceById (deviceId: string, userId: string): Promise<string | null> {
                 const isDeviceExist = await activeSessionsRepository.findDeviceById(deviceId)
