@@ -2,9 +2,11 @@ import {client} from "../database/mongo-db";
 import {DeletedObject, InsertedObject} from "../models/additional-types/mongo-db-types";
 import {ObjectId} from "mongodb";
 import {UserDbModel} from "../models/mongo-db-models/users-db-model";
+import {RecoveryCodeModel} from "../models/mongo-db-models/recovery-code-model";
 
 
 const usersCollection = client.db('bloggers-platform').collection<UserDbModel>('users')
+const recoveryPassCodes = client.db('bloggers-platform').collection<RecoveryCodeModel>('recovery-codes')
 
 export const usersRepository = {
     async findByLoginOrEmail(loginOrEmail: string): Promise<UserDbModel | null> {
@@ -37,5 +39,17 @@ export const usersRepository = {
     },
     async deleteUser (id: string): Promise<DeletedObject> {
         return await usersCollection.deleteOne({_id: new ObjectId(id)})
+    },
+    async createRecoveryConfirmationCode (recoveryCode: RecoveryCodeModel) {
+        return await recoveryPassCodes.insertOne(recoveryCode)
+    },
+    async findRecoveryConfirmationCode (recoveryCode: string) {
+        return await recoveryPassCodes.findOne({confirmationCode: recoveryCode})
+    },
+    async changeRecoveryCodeStatus (id: string) {
+        return await recoveryPassCodes.updateOne({_id: new ObjectId(id)}, {$set: {isUsed: true}})
+    },
+    async updatePassword (email: string, hash: string) {
+        return await usersCollection.updateOne({email: email}, {$set: {passwordHash: hash}})
     }
 }

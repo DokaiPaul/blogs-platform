@@ -1,8 +1,15 @@
 import {
-    blogIdValidationMiddleware, contentValidation,
+    blogIdValidationMiddleware,
+    contentValidation,
     contentValidationMiddleware,
-    descriptionValidationMiddleware, emailValidation, loginValidation,
-    nameValidationMiddleware, passwordValidation, shortDescriptionValidationMiddleware, titleValidationMiddleware,
+    descriptionValidationMiddleware,
+    emailValidation,
+    loginValidation,
+    nameValidationMiddleware,
+    passwordValidation,
+    recoveryCode,
+    shortDescriptionValidationMiddleware,
+    titleValidationMiddleware,
     websiteUrlValidationMiddleware
 } from "./common-validation-middleware";
 
@@ -33,4 +40,9 @@ export const usersBodyValidationMiddleware = [
 
 export const commentBodyValidationMiddleware = [
     contentValidation
+]
+
+export const passwordRecoveryValidationMiddleware = [
+    passwordValidation,
+    recoveryCode
 ]

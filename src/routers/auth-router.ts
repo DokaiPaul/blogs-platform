@@ -1,12 +1,15 @@
 import {Router, Request, Response} from "express";
 import {userService} from "../domain/users-service";
-import {passwordValidation} from "../middlewares/body-validation/common-validation-middleware";
+import {emailValidation, passwordValidation} from "../middlewares/body-validation/common-validation-middleware";
 import {body} from "express-validator";
 import {checkErrors} from "../middlewares/check-errors";
 import {usersQueryRepository} from "../repositories/query-repositories/users-query-repository";
 import {authMiddleware} from "../middlewares/autorization-middleware";
 import {jwtService} from "../application/jwt-service";
-import {usersBodyValidationMiddleware} from "../middlewares/body-validation/body-validation-middleware";
+import {
+    passwordRecoveryValidationMiddleware,
+    usersBodyValidationMiddleware
+} from "../middlewares/body-validation/body-validation-middleware";
 import {checkRateLimit} from "../middlewares/rate-limit-middleware";
 import {v4 as uuidv4} from "uuid";
 import {ActiveSessionModel} from "../models/mongo-db-models/active-session-model";
@@ -97,8 +100,7 @@ authRouter.post('/registration-confirmation',
 
 authRouter.post('/registration-email-resending',
     checkRateLimit,
-    body('email').isString().withMessage('Your email should be a string').bail()
-        .matches(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/).withMessage('Your email is incorrect'),
+    emailValidation,
     checkErrors,
     async (req: Request, res: Response) => {
 
@@ -140,4 +142,31 @@ authRouter.post('/logout', async (req: Request, res: Response) => {
     }
     await activeSessionsService.deleteDeviceById(result.deviceId, result.userId)
     res.sendStatus(204)
+})
+
+authRouter.post('/password-recovery',
+    checkRateLimit,
+    emailValidation,
+    checkErrors,
+    async (req: Request, res: Response) => {
+
+        await userService.sendEmailToRecoverPassword(req.body.email)
+
+        res.sendStatus(204) //send 204 status even there is no such email in DB. This is created to avoid real emails detection
+})
+
+authRouter.post('/new-password',
+    checkRateLimit,
+    passwordRecoveryValidationMiddleware,
+    checkErrors,
+    async (req: Request, res: Response) => {
+        const {newPassword, recoveryCode} = req.body
+        const result = await userService.confirmPasswordRecovery({newPassword, recoveryCode})
+
+        if(!result) {
+            res.sendStatus(400)
+            return
+        }
+
+        res.sendStatus(204)
 })

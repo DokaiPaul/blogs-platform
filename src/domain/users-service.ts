@@ -8,6 +8,7 @@ import {v4 as uuidv4} from 'uuid'
 import add from 'date-fns/add'
 import {ObjectId} from "mongodb";
 import {emailsManager} from "../managers/email-sender-manager";
+import {PasswordRecoveryInputModel} from "../models/input-models/password-recovery-input-model";
 
 export const userService = {
     async createUser (body: UserInputType): Promise<UsersViewModel | null | string> {
@@ -98,6 +99,45 @@ export const userService = {
         const result = await usersRepository.deleteUser(id)
 
         return result.deletedCount === 1
+    },
+    async sendEmailToRecoverPassword (email: string) {
+        const user = await usersRepository.findByEmail(email)
+        if(!user) return null
+
+        const confirmationCode = uuidv4()
+
+        const recoveryCodeObject = {
+            confirmationCode,
+            isUsed: false,
+            creationDate: new Date(),
+            email: email
+        }
+        try{
+            const result = await usersRepository.createRecoveryConfirmationCode(recoveryCodeObject)
+            if(!result) return null
+
+            await emailsManager.sendPasswordRecoveryCode(user, confirmationCode)
+            return true
+        } catch (e) {
+            console.error(e)
+            return null
+        }
+    },
+    async confirmPasswordRecovery (recoveryData: PasswordRecoveryInputModel) {
+        const result = await usersRepository.findRecoveryConfirmationCode(recoveryData.recoveryCode)
+
+        if(!result) return null
+        if(result.isUsed) return null //if isUsed is true then the confirmation code is extra and not valid
+
+        const passwordSalt = await bcrypt.genSalt(10)
+        const passwordHash = await this._generateHash(recoveryData.newPassword, passwordSalt)
+
+        const updatePassword = await usersRepository.updatePassword(result.email, passwordHash)
+
+        if(updatePassword.matchedCount !== 1) return null
+
+        await usersRepository.changeRecoveryCodeStatus(result.confirmationCode)
+        return true
     },
     async _generateHash(pass: string, salt: string): Promise<string> {
         return await bcrypt.hash(pass, salt)
