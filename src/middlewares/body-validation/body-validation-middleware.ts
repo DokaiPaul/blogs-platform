@@ -5,7 +5,7 @@ import {
     descriptionValidationMiddleware,
     emailValidation,
     loginValidation,
-    nameValidationMiddleware,
+    nameValidationMiddleware, newPasswordValidation,
     passwordValidation,
     recoveryCode,
     shortDescriptionValidationMiddleware,
@@ -43,6 +43,6 @@ export const commentBodyValidationMiddleware = [
 ]
 
 export const passwordRecoveryValidationMiddleware = [
-    passwordValidation,
+    newPasswordValidation,
     recoveryCode
 ]

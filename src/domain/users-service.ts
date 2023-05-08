@@ -136,8 +136,8 @@ export const userService = {
 
         if(updatePassword.matchedCount !== 1) return null
 
-        await usersRepository.changeRecoveryCodeStatus(result.confirmationCode)
-        return true
+        await usersRepository.changeRecoveryCodeStatus(result._id)
+        return updatePassword
     },
     async _generateHash(pass: string, salt: string): Promise<string> {
         return await bcrypt.hash(pass, salt)

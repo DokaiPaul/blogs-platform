@@ -92,6 +92,16 @@ export const passwordValidation = body('password')
     .withMessage('Length is incorrect and must be from 6 to 20 symbols')
     .bail()
 
+export const newPasswordValidation = body('newPassword')
+    .notEmpty()
+    .bail()
+    .isString()
+    .withMessage('Password should be a string')
+    .bail()
+    .isLength({min: 6, max: 20})
+    .withMessage('Length is incorrect and must be from 6 to 20 symbols')
+    .bail()
+
 
 export const emailValidation = body('email')
     .notEmpty()

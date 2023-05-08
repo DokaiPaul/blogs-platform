@@ -46,8 +46,8 @@ export const usersRepository = {
     async findRecoveryConfirmationCode (recoveryCode: string) {
         return await recoveryPassCodes.findOne({confirmationCode: recoveryCode})
     },
-    async changeRecoveryCodeStatus (id: string) {
-        return await recoveryPassCodes.updateOne({_id: new ObjectId(id)}, {$set: {isUsed: true}})
+    async changeRecoveryCodeStatus (id: ObjectId) {
+        return await recoveryPassCodes.updateOne({_id: id}, {$set: {isUsed: true}})
     },
     async updatePassword (email: string, hash: string) {
         return await usersCollection.updateOne({email: email}, {$set: {passwordHash: hash}})
