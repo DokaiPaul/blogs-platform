@@ -164,7 +164,7 @@ authRouter.post('/new-password',
         const result = await userService.confirmPasswordRecovery({newPassword, recoveryCode})
 
         if(!result) {
-            res.sendStatus(400)
+            res.status(400).send({ errorsMessages: [{ message: 'Code is incorrect', field: "recoveryCode" }] })
             return
         }
 

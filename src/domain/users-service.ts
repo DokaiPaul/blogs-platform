@@ -86,7 +86,7 @@ export const userService = {
         const user = await usersRepository.findByLoginOrEmail(loginOrEmail);
 
         if(user) {
-            const passwordSalt = user.passwordSalt
+            const passwordSalt = user.passwordHash.slice(0, 30)
             const passwordHash = await this._generateHash(password, passwordSalt)
 
             if (passwordHash === user.passwordHash) {
@@ -137,6 +137,7 @@ export const userService = {
         if(updatePassword.matchedCount !== 1) return null
 
         await usersRepository.changeRecoveryCodeStatus(result._id)
+
         return updatePassword
     },
     async _generateHash(pass: string, salt: string): Promise<string> {
