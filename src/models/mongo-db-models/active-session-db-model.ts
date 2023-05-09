@@ -1,4 +1,4 @@
-export type ActiveSessionModel =
+export type ActiveSessionDbModel =
     {
         ip: string,
         title: string,

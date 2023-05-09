@@ -1,31 +1,26 @@
-import {client} from "../../database/mongo-db";
 import {MeViewModel, UsersViewModel} from "../../models/view-models/users-view-model";
 import {QueryUsersModel} from "../../models/query-models/query-users-model";
 import {parseUsersQuery} from "./utils/process-query-params";
-import {ObjectId, Sort} from "mongodb";
+import {ObjectId} from "mongodb";
 import {changeKeyName} from "../../utils/object-operations";
 import {Paginator} from "../../models/view-models/paginator-view-model";
-import {UserDbModel} from "../../models/mongo-db-models/users-db-model";
-
-
-
-const usersCollection =  client.db('bloggers-platform').collection<UserDbModel>('users')
+import {UserModel} from "../../database/models/user-model";
+import {SortOrder} from "mongoose";
 
 export const usersQueryRepository = {
     async findUsers (query: QueryUsersModel): Promise<Paginator<UsersViewModel[]>> {
-        const [searchLoginTerm, searchEmailTerm, sortBy, sortDir, pageNum, pageSize] = parseUsersQuery(query)
+        const {searchLoginTerm, searchEmailTerm, sortBy, sortDir, pageNum, pageSize} = parseUsersQuery(query)
         let filter = {}
-        let sort = {[sortBy]: sortDir} as Sort
+        let sort = {[sortBy]: sortDir as SortOrder}
 
         if(searchEmailTerm) filter = {email: {$regex: searchEmailTerm, $options: 'i'}}
         if(searchLoginTerm) filter = {login: {$regex: searchLoginTerm, $options: 'i'}}
         if(searchEmailTerm && searchLoginTerm) filter = {$or: [{login: {$regex: searchLoginTerm, $options: 'i'}}, {email: {$regex: searchEmailTerm, $options: 'i'}}]}
 
-        const users: UsersViewModel[] = await usersCollection.find(filter)
+        const users: UsersViewModel[] = await UserModel.find(filter)
             .sort(sort)
             .limit(pageSize)
             .skip((pageNum - 1) * pageSize)
-            .toArray();
 
         users.forEach(b => changeKeyName(b, '_id', 'id'))
         users.map(u => {
@@ -34,7 +29,7 @@ export const usersQueryRepository = {
             delete u.passwordHash
         })
 
-        const totalMatchedPosts = await usersCollection.countDocuments(filter)
+        const totalMatchedPosts = await UserModel.countDocuments(filter)
         const totalPages = Math.ceil(totalMatchedPosts / pageSize)
 
         return {
@@ -46,7 +41,7 @@ export const usersQueryRepository = {
         };
     },
     async findUserById(id: string): Promise<MeViewModel | null> {
-        const user = await usersCollection.findOne({_id: new ObjectId(id)})
+        const user = await UserModel.findOne({_id: new ObjectId(id)})
 
         if(!user) return null
 

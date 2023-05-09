@@ -1,4 +1,4 @@
-import {ActiveSessionModel} from "../models/mongo-db-models/active-session-model";
+import {ActiveSessionDbModel} from "../models/mongo-db-models/active-session-db-model";
 import {activeSessionsRepository} from "../repositories/active-sessions-repository";
 import {jwtService} from "../application/jwt-service";
 
@@ -27,7 +27,7 @@ export const activeSessionsService =
                         }
                 })
         },
-        async addDevice (sessionInfo: ActiveSessionModel) {
+        async addDevice (sessionInfo: ActiveSessionDbModel) {
                 const accessToken = await jwtService.createAccessJWT(sessionInfo.userId)
                 const refreshToken = await jwtService.createRefreshJWT(sessionInfo.deviceId, sessionInfo.userId)
                 const parsedRToken = await jwtService.parseJWT(refreshToken)

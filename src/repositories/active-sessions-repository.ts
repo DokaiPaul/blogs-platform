@@ -1,26 +1,26 @@
-import {client} from "../database/mongo-db";
-import {ActiveSessionModel} from "../models/mongo-db-models/active-session-model";
+import {ActiveSessionDbModel} from "../models/mongo-db-models/active-session-db-model";
+import {ActiveSessionModel} from "../database/models/active-session-model";
 
-const activeSessionsCollection = client.db('bloggers-platform').collection<ActiveSessionModel>('active-sessions')
 
 export const activeSessionsRepository =
     {
+        //todo add type of output global for all methods below!!!
         async findDevicesByUserId(userId: string) {
-            return await activeSessionsCollection.find({userId: userId}) .toArray()
+            return ActiveSessionModel.find({userId: userId})
         },
-        async findDeviceById (deviceId: string): Promise<ActiveSessionModel | null> {
-            return await activeSessionsCollection.findOne({deviceId: deviceId})
+        async findDeviceById (deviceId: string): Promise<ActiveSessionDbModel | null> {
+            return ActiveSessionModel.findOne({deviceId: deviceId})
         },
-        async addDevice (newDevice: ActiveSessionModel) {
-            return await activeSessionsCollection.insertOne(newDevice)
+        async addDevice (newDevice: ActiveSessionDbModel) {
+            return await ActiveSessionModel.create(newDevice)
         },
         async updateDevice (deviceId: string, lastActiveDate: string, expDate: string) {
-            return await activeSessionsCollection.updateOne({deviceId: deviceId}, {$set: {lastActiveDate: lastActiveDate, tokenExpirationDate: expDate}})
+            return ActiveSessionModel.updateOne({deviceId: deviceId}, {lastActiveDate: lastActiveDate, tokenExpirationDate: expDate})
         },
         async deleteDeviceById (deviceId: string) {
-            return await activeSessionsCollection.deleteOne({deviceId: deviceId})
+            return ActiveSessionModel.deleteOne({deviceId: deviceId})
         },
         async deleteAllOtherDevices (deviceId: string, userId: string) {
-            return await activeSessionsCollection.deleteMany({userId: userId, deviceId: {$ne: deviceId}})
+            return ActiveSessionModel.deleteMany({userId: userId, deviceId: {$ne: deviceId}})
         }
     }

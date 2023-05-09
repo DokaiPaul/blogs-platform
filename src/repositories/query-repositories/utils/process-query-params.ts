@@ -5,6 +5,17 @@ import {PostsType} from "../../../models/view-models/posts-view-model";
 import {QueryUsersModel} from "../../../models/query-models/query-users-model";
 import {UsersViewModel} from "../../../models/view-models/users-view-model";
 
+type ProcessedQuery = {
+    searchByTerm?: string | null,
+    searchLoginTerm?: string | null,
+    searchEmailTerm?: string | null,
+    sortBy: string,
+    sortDir: string,
+    pageNum: number,
+    pageSize: number
+
+}
+
 export const processQuery = (q: QueryBlogsModel) => {
     let searchByTerm = q.searchNameTerm ?? null
     let sortBy = q.sortBy ?? 'createdAt'
@@ -31,7 +42,7 @@ export const processQuery = (q: QueryBlogsModel) => {
         if(pageSize > 100) pageSize = 100
     }
 
-    const output: [string | null, string, string, number, number] = [searchByTerm, sortBy, sortDir, pageNum, pageSize]
+    const output: ProcessedQuery = {searchByTerm, sortBy, sortDir, pageNum, pageSize}
     return output
 }
 
@@ -61,7 +72,7 @@ export const parsePostsQuery = (q: QueryPostsModel) => {
         if(pageSize > 100) pageSize = 100
     }
 
-    const output: [string, string, number, number] = [sortBy, sortDir, pageNum, pageSize]
+    const output: ProcessedQuery = {sortBy, sortDir, pageNum, pageSize}
     return output
 }
 
@@ -90,6 +101,6 @@ export const parseUsersQuery = (q: QueryUsersModel) => {
         if(pageSize > 100) pageSize = 100
     }
 
-    const output: [string | null, string | null, string, string, number, number] = [searchLoginTerm, searchEmailTerm, sortBy, sortDir, pageNum, pageSize]
+    const output: ProcessedQuery = {searchLoginTerm, searchEmailTerm, sortBy, sortDir, pageNum, pageSize}
     return output
 }

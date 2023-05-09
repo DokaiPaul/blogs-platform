@@ -1,18 +1,18 @@
 import {IpRequestModel} from "../models/mongo-db-models/ip-request-model";
-import {client} from "../database/mongo-db";
 import {subSeconds} from "date-fns";
+import {RateLimitModel} from "../database/models/rate-limit-model";
 
-const rateLimitCollection = client.db('bloggers-platform').collection<IpRequestModel>('ip-requests')
 export const RequestLimitRepository =
     {
+        //todo add typisation for all methods below
         async addRequest (data: IpRequestModel) {
-            await rateLimitCollection.insertOne(data)
+            return await RateLimitModel.create(data)
         },
         async findRequestForIP (ip: string, url: string, date: Date) {
             const filter = {ip: ip, url: url, date: {$gte: subSeconds(date, 10)}}
-            return rateLimitCollection.find(filter).toArray()
+            return RateLimitModel.find(filter)
         },
         async removeOutdatedRequests (date: Date) {
-            return rateLimitCollection.deleteMany({date: {$lt: subSeconds(date, 20)}})
+            return RateLimitModel.deleteMany({date: {$lt: subSeconds(date, 20)}})
         }
     }

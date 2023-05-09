@@ -1,31 +1,32 @@
 import {PostInputType} from "../models/input-models/posts-input-model";
-import {client} from "../database/mongo-db";
 import {ObjectId} from "mongodb";
-import {DeletedObject, InsertedObject, UpdatedObject} from "../models/additional-types/mongo-db-types";
+import {DeletedObject} from "../models/additional-types/mongo-db-types";
 import {PostsType} from "../models/view-models/posts-view-model";
-import {PostsDbModel} from "../models/mongo-db-models/posts-db-model";
+import {PostModel} from "../database/models/post-model";
 
-const postCollection = client.db('bloggers-platform').collection<PostsDbModel>('posts')
+
 export const postsRepository = {
     async findAllPosts (): Promise<PostsType[] | null | undefined> {
 
-        return await postCollection.find({}).toArray();
+        return PostModel.find({});
     },
     async findPostsInBlog (id: string): Promise<PostsType[] | null | undefined>{
 
-        return await postCollection.find({blogId: id}).toArray()
+        return PostModel.find({blogId: id})
     },
     async findPostById (id: string): Promise<PostsType | null | undefined> {
 
-        return await postCollection.findOne({_id: new ObjectId(id)});
+        return PostModel.findOne({_id: new ObjectId(id)});
     },
-    async createPost (post: PostsType): Promise<InsertedObject> {
+    //todo add type for output
+    async createPost (post: PostsType) {
 
-        return await postCollection.insertOne(post);
+        return await PostModel.create(post);
     },
-    async updatePost (id: string, body: PostInputType): Promise<UpdatedObject> {
+    //todo add type for output
+    async updatePost (id: string, body: PostInputType) {
 
-        return await postCollection.updateOne({_id: new ObjectId(id)}, {$set: {
+        return PostModel.updateOne({_id: new ObjectId(id)}, {$set: {
             title: body.title,
             shortDescription: body.shortDescription,
             content: body.content,
@@ -34,6 +35,6 @@ export const postsRepository = {
     },
     async deletePostById (id: string): Promise<DeletedObject> {
 
-        return await  postCollection.deleteOne({_id: new ObjectId(id)})
+        return PostModel.deleteOne({_id: new ObjectId(id)})
     }
 }

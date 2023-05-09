@@ -12,7 +12,7 @@ import {
 } from "../middlewares/body-validation/body-validation-middleware";
 import {checkRateLimit} from "../middlewares/rate-limit-middleware";
 import {v4 as uuidv4} from "uuid";
-import {ActiveSessionModel} from "../models/mongo-db-models/active-session-model";
+import {ActiveSessionDbModel} from "../models/mongo-db-models/active-session-db-model";
 import {activeSessionsService} from "../domain/active-sessions-service";
 
 export const authRouter = Router({})
@@ -27,7 +27,7 @@ authRouter.post('/login', checkRateLimit ,body('loginOrEmail').isString(), passw
             return
         }
 
-        const sessionInfo: ActiveSessionModel = {
+        const sessionInfo: ActiveSessionDbModel = {
             deviceId: uuidv4(),
             userId: user._id.toString(),
             ip,
