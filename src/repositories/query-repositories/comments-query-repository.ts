@@ -21,6 +21,9 @@ export const commentsQueryRepository =
                 .sort(sort)
                 .limit(pageSize)
                 .skip((pageNum - 1) * pageSize)
+                .lean()
+
+            if(!comments) comments = []
 
             if(comments) comments.forEach(v => {
 
@@ -40,7 +43,7 @@ export const commentsQueryRepository =
             }
         },
         async findCommentById (id: string) {
-            const comment = await CommentModel.findOne({_id: new ObjectId(id)})
+            const comment = await CommentModel.findOne({_id: new ObjectId(id)}).lean()
             if(!comment) return null
 
             const output: CommentViewModel = {...comment}

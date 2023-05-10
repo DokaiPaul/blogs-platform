@@ -4,13 +4,13 @@ import {ActiveSessionModel} from "../database/models/active-session-model";
 
 export const activeSessionsRepository =
     {
-        //todo add type of output global for all methods below!!!
-        async findDevicesByUserId(userId: string) {
-            return ActiveSessionModel.find({userId: userId})
+        async findDevicesByUserId(userId: string): Promise<ActiveSessionDbModel | null> {
+            return ActiveSessionModel.find({userId: userId}).lean()
         },
         async findDeviceById (deviceId: string): Promise<ActiveSessionDbModel | null> {
-            return ActiveSessionModel.findOne({deviceId: deviceId})
+            return ActiveSessionModel.findOne({deviceId: deviceId}).lean()
         },
+        //todo add type of output global for all methods below!!!
         async addDevice (newDevice: ActiveSessionDbModel) {
             return await ActiveSessionModel.create(newDevice)
         },

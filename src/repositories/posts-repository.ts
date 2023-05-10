@@ -6,17 +6,17 @@ import {PostModel} from "../database/models/post-model";
 
 
 export const postsRepository = {
-    async findAllPosts (): Promise<PostsType[] | null | undefined> {
+    async findAllPosts (): Promise<PostsType[] | null> {
 
-        return PostModel.find({});
+        return PostModel.find({}).lean();
     },
-    async findPostsInBlog (id: string): Promise<PostsType[] | null | undefined>{
+    async findPostsInBlog (id: string): Promise<PostsType[] | null>{
 
-        return PostModel.find({blogId: id})
+        return PostModel.find({blogId: id}).lean()
     },
-    async findPostById (id: string): Promise<PostsType | null | undefined> {
+    async findPostById (id: string): Promise<PostsType | null> {
 
-        return PostModel.findOne({_id: new ObjectId(id)});
+        return PostModel.findOne({_id: new ObjectId(id)}).lean();
     },
     //todo add type for output
     async createPost (post: PostsType) {

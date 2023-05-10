@@ -5,13 +5,13 @@ import {BlogsType} from "../models/view-models/blogs-view-model";
 import {BlogModel} from "../database/models/blog-model";
 
 export const blogsRepository = {
-    async findAllBlogs (): Promise<BlogsType[] | null | undefined> {
+    async findAllBlogs (): Promise<BlogsType[] | null> {
 
-        return BlogModel.find({});
+        return BlogModel.find({}).lean();
     },
-    async findBlogById (id: string): Promise<BlogsType | null | undefined> {
+    async findBlogById (id: string): Promise<BlogsType | null> {
 
-        return BlogModel.findOne({_id: new ObjectId(id)});
+        return BlogModel.findOne({_id: new ObjectId(id)}).lean();
     },
     //todo add type for output
     async createBlog (blog: BlogsType) {

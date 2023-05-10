@@ -21,6 +21,7 @@ export const usersQueryRepository = {
             .sort(sort)
             .limit(pageSize)
             .skip((pageNum - 1) * pageSize)
+            .lean()
 
         users.forEach(b => changeKeyName(b, '_id', 'id'))
         users.map(u => {
@@ -41,7 +42,7 @@ export const usersQueryRepository = {
         };
     },
     async findUserById(id: string): Promise<MeViewModel | null> {
-        const user = await UserModel.findOne({_id: new ObjectId(id)})
+        const user = await UserModel.findOne({_id: new ObjectId(id)}).lean()
 
         if(!user) return null
 

@@ -8,7 +8,7 @@ import {BlogModel} from "../../database/models/blog-model";
 import {SortOrder} from "mongoose";
 
 export const blogsQueryRepository = {
-    async findBlogs (req: RequestWithQuery<QueryBlogsModel>): Promise<Paginator<BlogsType[]> | null | undefined> {
+    async findBlogs (req: RequestWithQuery<QueryBlogsModel>): Promise<Paginator<BlogsType[]>> {
         const {searchByTerm, sortBy, sortDir, pageNum, pageSize} = processQuery(req.query);
 
         let blogs: BlogsType[] | null;
@@ -22,6 +22,9 @@ export const blogsQueryRepository = {
             .sort(sort)
             .limit(pageSize)
             .skip((pageNum - 1) * pageSize)
+            .lean()
+
+        if(!blogs) blogs = []
 
         blogs.forEach(b => changeKeyName(b, '_id', 'id'))
 

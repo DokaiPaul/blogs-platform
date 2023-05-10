@@ -8,18 +8,19 @@ import {RecoveryCodeModel} from "../database/models/recovery-code-model";
 
 export const usersRepository = {
     async findByLoginOrEmail(loginOrEmail: string): Promise<UserDbModel | null> {
-        return UserModel.findOne({$or: [{email: loginOrEmail}, {login: loginOrEmail}]})
+        return UserModel.findOne({$or: [{email: loginOrEmail}, {login: loginOrEmail}]}).lean()
     },
     //todo add type for function return
     async findByLogin(login: string) {
-        return UserModel.findOne({login: login})
+        return UserModel.findOne({login: login}).lean()
     },
     //todo add type for function return
     async findByEmail(email: string) {
-        return UserModel.findOne({email: email})
+        return UserModel.findOne({email: email}).lean()
     },
     async findByConfirmationCode (code: string): Promise<UserDbModel | null>{
-        const user = UserModel.findOne({'emailConfirmation.confirmationCode': code})
+        const user = UserModel.findOne({'emailConfirmation.confirmationCode': code}).lean()
+
         if(!user) return null
 
         return user
@@ -45,9 +46,8 @@ export const usersRepository = {
     async createRecoveryConfirmationCode (recoveryCode: RecoveryCodeDbModel) {
         return RecoveryCodeModel.create(recoveryCode)
     },
-    //todo add type for function return
-    async findRecoveryConfirmationCode (recoveryCode: string) {
-        return RecoveryCodeModel.findOne({confirmationCode: recoveryCode})
+    async findRecoveryConfirmationCode (recoveryCode: string): Promise<RecoveryCodeDbModel | null> {
+        return RecoveryCodeModel.findOne({confirmationCode: recoveryCode}).lean()
     },
     //todo add type for function return
     async changeRecoveryCodeStatus (id: ObjectId) {

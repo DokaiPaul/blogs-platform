@@ -19,6 +19,9 @@ export const postsQueryRepository = {
             .sort(sort)
             .limit(pageSize)
             .skip((pageNum - 1) * pageSize)
+            .lean()
+
+        if(!posts) posts = []
 
         posts.forEach(p => changeKeyName(p, '_id','id'))
 
