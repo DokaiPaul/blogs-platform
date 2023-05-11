@@ -5,10 +5,10 @@ import {ActiveSessionModel} from "../database/models/active-session-model";
 export const activeSessionsRepository =
     {
         async findDevicesByUserId(userId: string): Promise<ActiveSessionDbModel[] | null> {
-            return ActiveSessionModel.find({userId: userId}).lean()
+            return ActiveSessionModel.find({userId: userId}).select('-__v').lean()
         },
         async findDeviceById (deviceId: string): Promise<ActiveSessionDbModel | null> {
-            return ActiveSessionModel.findOne({deviceId: deviceId}).lean()
+            return ActiveSessionModel.findOne({deviceId: deviceId}).select('-__v').lean()
         },
         //todo add type of output global for all methods below!!!
         async addDevice (newDevice: ActiveSessionDbModel) {

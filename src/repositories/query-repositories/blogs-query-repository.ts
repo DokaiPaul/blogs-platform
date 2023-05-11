@@ -22,6 +22,7 @@ export const blogsQueryRepository = {
             .sort(sort)
             .limit(pageSize)
             .skip((pageNum - 1) * pageSize)
+            .select('-__v')
             .lean()
 
         if(!blogs) blogs = []

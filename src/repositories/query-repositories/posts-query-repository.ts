@@ -19,6 +19,7 @@ export const postsQueryRepository = {
             .sort(sort)
             .limit(pageSize)
             .skip((pageNum - 1) * pageSize)
+            .select('-__v')
             .lean()
 
         if(!posts) posts = []
@@ -47,8 +48,10 @@ export const postsQueryRepository = {
             .sort(sort)
             .limit(pageSize)
             .skip((pageNum - 1) * pageSize)
+            .select('-__v')
+            .lean()
 
-        if(posts.length < 1) return null;
+        if(!posts || posts.length < 1) return null;
 
         posts.forEach(p => changeKeyName(p, '_id','id'))
 

@@ -21,6 +21,7 @@ export const commentsQueryRepository =
                 .sort(sort)
                 .limit(pageSize)
                 .skip((pageNum - 1) * pageSize)
+                .select('-__v')
                 .lean()
 
             if(!comments) comments = []
@@ -43,7 +44,7 @@ export const commentsQueryRepository =
             }
         },
         async findCommentById (id: string) {
-            const comment = await CommentModel.findOne({_id: new ObjectId(id)}).lean()
+            const comment = await CommentModel.findOne({_id: new ObjectId(id)}).select('-__v').lean()
             if(!comment) return null
 
             const output: CommentViewModel = {...comment}

@@ -8,15 +8,15 @@ import {PostModel} from "../database/models/post-model";
 export const postsRepository = {
     async findAllPosts (): Promise<PostsType[] | null> {
 
-        return PostModel.find({}).lean();
+        return PostModel.find({}).select('-__v').lean()
     },
     async findPostsInBlog (id: string): Promise<PostsType[] | null>{
 
-        return PostModel.find({blogId: id}).lean()
+        return PostModel.find({blogId: id}).select('-__v').lean()
     },
     async findPostById (id: string): Promise<PostsType | null> {
 
-        return PostModel.findOne({_id: new ObjectId(id)}).lean();
+        return PostModel.findOne({_id: new ObjectId(id)}).select('-__v').lean()
     },
     //todo add type for output
     async createPost (post: PostsType) {

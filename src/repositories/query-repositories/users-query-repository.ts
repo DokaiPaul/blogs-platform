@@ -21,6 +21,7 @@ export const usersQueryRepository = {
             .sort(sort)
             .limit(pageSize)
             .skip((pageNum - 1) * pageSize)
+            .select('-__v')
             .lean()
 
         users.forEach(b => changeKeyName(b, '_id', 'id'))
@@ -42,7 +43,7 @@ export const usersQueryRepository = {
         };
     },
     async findUserById(id: string): Promise<MeViewModel | null> {
-        const user = await UserModel.findOne({_id: new ObjectId(id)}).lean()
+        const user = await UserModel.findOne({_id: new ObjectId(id)}).select('-__v').lean()
 
         if(!user) return null
 

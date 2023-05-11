@@ -11,7 +11,7 @@ export const RequestLimitRepository =
         },
         async findRequestForIP (ip: string, url: string, date: Date): Promise<IpRequestModel[] | null> {
             const filter = {ip: ip, url: url, date: {$gte: subSeconds(date, 10)}}
-            return RateLimitModel.find(filter).lean()
+            return RateLimitModel.find(filter).select('-__v').lean()
         },
         async removeOutdatedRequests (date: Date): Promise<DeletedObject> {
             return RateLimitModel.deleteMany({date: {$lt: subSeconds(date, 20)}})

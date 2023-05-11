@@ -7,11 +7,11 @@ import {BlogModel} from "../database/models/blog-model";
 export const blogsRepository = {
     async findAllBlogs (): Promise<BlogsType[] | null> {
 
-        return BlogModel.find({}).lean();
+        return BlogModel.find({}).select('-__v').lean();
     },
     async findBlogById (id: string): Promise<BlogsType | null> {
 
-        return BlogModel.findOne({_id: new ObjectId(id)}).lean();
+        return BlogModel.findOne({_id: new ObjectId(id)}).select('-__v').lean();
     },
     //todo add type for output
     async createBlog (blog: BlogsType) {
