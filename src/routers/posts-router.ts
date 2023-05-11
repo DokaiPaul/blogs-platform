@@ -5,7 +5,6 @@ import {
     commentBodyValidationMiddleware,
     postBodyValidationMiddleware
 } from "../middlewares/body-validation/body-validation-middleware";
-import {param} from "express-validator";
 import {postsService} from "../domain/posts-service";
 import {postsQueryRepository} from "../repositories/query-repositories/posts-query-repository";
 import {RequestWithParamsAndQuery, RequestWithQuery} from "../models/request-types";
@@ -14,6 +13,7 @@ import {authMiddleware} from "../middlewares/autorization-middleware";
 import {commentsService} from "../domain/comments-service";
 import {commentsQueryRepository} from "../repositories/query-repositories/comments-query-repository";
 import {QueryCommentsModel} from "../models/query-models/query-comments-model";
+import {isMongoId} from "../middlewares/params-validation/common-validaton-middleware";
 
 export const postsRouter = Router({});
 
@@ -23,7 +23,7 @@ postsRouter.get('/', async (req: RequestWithQuery<QueryPostsModel>, res: Respons
     res.send(posts);
 })
 
-postsRouter.get('/:id', param('id').isMongoId(), checkErrors, async (req: Request, res: Response) => {
+postsRouter.get('/:id', isMongoId, checkErrors, async (req: Request, res: Response) => {
 
     const post = await postsService.findPostById(req.params.id);
     if(!post) {
@@ -35,7 +35,7 @@ postsRouter.get('/:id', param('id').isMongoId(), checkErrors, async (req: Reques
 })
 
 postsRouter.get('/:id/comments',
-    param('id').isMongoId(),
+    isMongoId,
     checkErrors,
     async (req: RequestWithParamsAndQuery<{id: string}, QueryCommentsModel>, res: Response) => {
         const post = await postsService.findPostById(req.params.id)
@@ -49,7 +49,8 @@ postsRouter.get('/:id/comments',
         res.status(200).send(comments)
 })
 
-postsRouter.post('/:id/comments', param('id').isMongoId(),
+postsRouter.post('/:id/comments',
+    isMongoId,
     authMiddleware,
     commentBodyValidationMiddleware,
     checkErrors,
@@ -82,7 +83,7 @@ postsRouter.post('/',
 })
 
 postsRouter.put('/:id',
-    param('id').isMongoId(),
+    isMongoId,
     adminAuthMiddleware,
     postBodyValidationMiddleware,
     checkErrors,
@@ -98,7 +99,7 @@ postsRouter.put('/:id',
 })
 
 postsRouter.delete('/:id',
-    param('id').isMongoId(),
+    isMongoId,
     adminAuthMiddleware,
     checkErrors,
     async (req: Request, res: Response) => {

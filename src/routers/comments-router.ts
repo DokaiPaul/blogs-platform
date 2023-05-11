@@ -3,12 +3,12 @@ import {commentsQueryRepository} from "../repositories/query-repositories/commen
 import {commentsService} from "../domain/comments-service";
 import {authMiddleware} from "../middlewares/autorization-middleware";
 import {checkErrors} from "../middlewares/check-errors";
-import {param} from "express-validator";
 import {commentBodyValidationMiddleware} from "../middlewares/body-validation/body-validation-middleware";
+import {isMongoId} from "../middlewares/params-validation/common-validaton-middleware";
 
 export const commentsRouter = Router({})
 
-commentsRouter.get('/:id', async (req: Request, res: Response) => {
+commentsRouter.get('/:id', isMongoId, async (req: Request, res: Response) => {
     const comment = await commentsQueryRepository.findCommentById(req.params.id)
 
     if(!comment) {
@@ -20,7 +20,7 @@ commentsRouter.get('/:id', async (req: Request, res: Response) => {
 })
 
 commentsRouter.put('/:id',
-    param('id').isMongoId(),
+    isMongoId,
     authMiddleware,
     commentBodyValidationMiddleware,
     checkErrors,
@@ -42,7 +42,7 @@ commentsRouter.put('/:id',
 })
 
 commentsRouter.delete('/:id',
-    param('id').isMongoId(),
+    isMongoId,
     authMiddleware,
     checkErrors,
     async (req: Request, res: Response) => {

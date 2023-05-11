@@ -15,6 +15,8 @@ export const checkRateLimit = async (req: Request, res: Response, next: NextFunc
     await RequestLimitRepository.addRequest({ip, url, date})
     const result = await RequestLimitRepository.findRequestForIP(ip, url, date)
 
+    if(!result) return next()
+
     await RequestLimitRepository.removeOutdatedRequests(date)
 
     if(result.length > 5) {

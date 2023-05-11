@@ -4,7 +4,7 @@ import {ActiveSessionModel} from "../database/models/active-session-model";
 
 export const activeSessionsRepository =
     {
-        async findDevicesByUserId(userId: string): Promise<ActiveSessionDbModel | null> {
+        async findDevicesByUserId(userId: string): Promise<ActiveSessionDbModel[] | null> {
             return ActiveSessionModel.find({userId: userId}).lean()
         },
         async findDeviceById (deviceId: string): Promise<ActiveSessionDbModel | null> {

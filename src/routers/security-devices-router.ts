@@ -1,7 +1,7 @@
 import {Router, Request, Response} from "express";
 import {jwtService} from "../application/jwt-service";
 import {activeSessionsService} from "../domain/active-sessions-service";
-import {param} from "express-validator";
+import {isMongoId} from "../middlewares/params-validation/common-validaton-middleware";
 
 export const securityDevicesRouter = Router({})
 
@@ -27,7 +27,7 @@ securityDevicesRouter.delete('/', async (req: Request, res: Response) => {
     res.sendStatus(204)
 })
 
-securityDevicesRouter.delete('/:id', param('id').isMongoId(), async (req: Request, res: Response) => {
+securityDevicesRouter.delete('/:id', isMongoId, async (req: Request, res: Response) => {
     const refreshToken = req.cookies.refreshToken
     const result = await jwtService.verifyRefreshToken(refreshToken)
     if(!result) {

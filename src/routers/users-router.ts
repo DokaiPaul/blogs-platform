@@ -6,7 +6,7 @@ import {RequestWithQuery} from "../models/request-types";
 import {QueryUsersModel} from "../models/query-models/query-users-model";
 import {userService} from "../domain/users-service";
 import {usersBodyValidationMiddleware} from "../middlewares/body-validation/body-validation-middleware";
-import {param} from "express-validator";
+import {isMongoId} from "../middlewares/params-validation/common-validaton-middleware";
 
 export const usersRouter = Router({})
 
@@ -37,7 +37,7 @@ usersRouter.post('/', adminAuthMiddleware, usersBodyValidationMiddleware, checkE
         res.status(201).json(user)
 })
 
-usersRouter.delete('/:id', param('id').isMongoId() ,adminAuthMiddleware, checkErrors,
+usersRouter.delete('/:id', isMongoId ,adminAuthMiddleware, checkErrors,
     async (req: Request, res: Response) => {
         const result = await userService.deleteUser(req.params.id)
         if(!result) {

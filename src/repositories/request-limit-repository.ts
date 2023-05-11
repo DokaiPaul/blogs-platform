@@ -9,7 +9,7 @@ export const RequestLimitRepository =
         async addRequest (data: IpRequestModel) {
             return await RateLimitModel.create(data)
         },
-        async findRequestForIP (ip: string, url: string, date: Date): Promise<IpRequestModel | null> {
+        async findRequestForIP (ip: string, url: string, date: Date): Promise<IpRequestModel[] | null> {
             const filter = {ip: ip, url: url, date: {$gte: subSeconds(date, 10)}}
             return RateLimitModel.find(filter).lean()
         },

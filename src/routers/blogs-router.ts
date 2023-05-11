@@ -2,13 +2,13 @@ import {Request, Response, Router} from "express";
 import {bodyValidationMiddleware, postInBlogBodyValidationMiddleware} from "../middlewares/body-validation/body-validation-middleware";
 import {checkErrors} from "../middlewares/check-errors";
 import {adminAuthMiddleware} from "../middlewares/admin-auth-middleware";
-import {param} from "express-validator";
 import {blogsService} from "../domain/blogs-service";
 import {RequestWithParamsAndQuery} from "../models/request-types";
 import {QueryBlogsModel} from "../models/query-models/query-blogs-model";
 import {blogsQueryRepository} from "../repositories/query-repositories/blogs-query-repository";
 import {QueryPostsModel} from "../models/query-models/query-posts-model";
 import {postsQueryRepository} from "../repositories/query-repositories/posts-query-repository";
+import {isMongoId} from "../middlewares/params-validation/common-validaton-middleware";
 
 export const blogsRouter = Router({})
 
@@ -20,7 +20,7 @@ blogsRouter.get('/', async (req: RequestWithParamsAndQuery<{id: string},QueryBlo
     res.send(blogs);
 })
 
-blogsRouter.get('/:id', param('id').isMongoId(), checkErrors,
+blogsRouter.get('/:id', isMongoId, checkErrors,
     async (req: Request, res: Response) => {
 
     const blog = await blogsService.findBlogById(req.params.id);
@@ -32,7 +32,7 @@ blogsRouter.get('/:id', param('id').isMongoId(), checkErrors,
     res.send(blog);
 })
 
-blogsRouter.get('/:id/posts', param('id').isMongoId(), checkErrors,
+blogsRouter.get('/:id/posts', isMongoId, checkErrors,
     async (req: RequestWithParamsAndQuery<{id: string}, QueryPostsModel>, res: Response) => {
 
     const blogs = await postsQueryRepository.findPostsInBlog(req);
@@ -57,7 +57,7 @@ blogsRouter.post('/' ,
 })
 
 blogsRouter.post('/:id/posts',
-    param('id').isMongoId(),
+    isMongoId,
     adminAuthMiddleware,
     postInBlogBodyValidationMiddleware,
     checkErrors,
@@ -73,7 +73,7 @@ blogsRouter.post('/:id/posts',
 })
 
 blogsRouter.put('/:id',
-    param('id').isMongoId(),
+    isMongoId,
     adminAuthMiddleware,
     bodyValidationMiddleware,
     checkErrors,
@@ -89,7 +89,7 @@ blogsRouter.put('/:id',
 })
 
 blogsRouter.delete('/:id',
-    param('id').isMongoId(),
+    isMongoId,
     adminAuthMiddleware,
     checkErrors,
     async (req: Request, res: Response) => {

@@ -31,6 +31,7 @@ authRouter.post('/login', checkRateLimit ,body('loginOrEmail').isString(), passw
             deviceId: uuidv4(),
             userId: user._id.toString(),
             ip,
+            lastActiveDate: 'date',
             title: req.headers['user-agent']
         }
 

@@ -135,7 +135,7 @@ export const userService = {
         const updatePassword = await usersRepository.updatePassword(result.email, passwordHash)
 
         if(updatePassword.matchedCount !== 1) return null
-
+        if(!result._id) return null
         await usersRepository.changeRecoveryCodeStatus(result._id)
 
         return updatePassword

@@ -17,6 +17,10 @@ export const checkErrors = (req: Request, res: Response, next: NextFunction) => 
                 res.status(401).json(errorsArr)
                 return
             }
+            else if(e.param === 'id') {
+                res.status(404).json(errorsArr)
+                return
+            }
         })
         res.status(400).json(errorsArr)
     }

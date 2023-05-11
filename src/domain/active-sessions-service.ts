@@ -1,6 +1,7 @@
 import {ActiveSessionDbModel} from "../models/mongo-db-models/active-session-db-model";
 import {activeSessionsRepository} from "../repositories/active-sessions-repository";
 import {jwtService} from "../application/jwt-service";
+import {DeviceViewModel} from "../models/view-models/device-view-model";
 
 export const activeSessionsService =
     {
@@ -15,8 +16,10 @@ export const activeSessionsService =
                         deviceId: session.deviceId
                 }
         },
-        async findDevicesByUserId(userId: string) {
+        async findDevicesByUserId(userId: string): Promise<DeviceViewModel[] | null> {
                 const sessions = await activeSessionsRepository.findDevicesByUserId(userId)
+
+                if(!sessions) return null
 
                 return sessions.map(v => {
                         return {
