@@ -40,5 +40,13 @@ export const jwtService =
             } catch (e) {
                 return null
             }
+        },
+        async getUserIdByJWT (token: string) {
+            try {
+                const result: any = jwt.decode(token)
+                return result.userId
+            } catch (e) {
+                return null
+            }
         }
     }

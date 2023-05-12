@@ -13,11 +13,11 @@ export const commentsQueryRepository =
     {
         async findCommentsInPost (req: RequestWithParamsAndQuery<{id: string}, QueryCommentsModel>): Promise<Paginator<CommentViewModel[]>> {
             const {sortBy, sortDir, pageNum, pageSize} = parsePostsQuery(req.query);
-
             let comments: CommentsDbModel[] | null;
             let output: CommentViewModel[]
             let sort = {[sortBy]: sortDir as SortOrder}
             let filter = {postId: req.params.id}
+            let userId = req.userId ?? null
 
             comments = await CommentModel.find(filter)
                 .sort(sort)
@@ -35,10 +35,23 @@ export const commentsQueryRepository =
 
                 output = [...comments] as CommentViewModel[]
                 output.map(c => {
+                    let myStatus: LikeStatus;
+
+                    if(userId) {
+                        const isLiked = c.likes?.find(u => u.userId === userId)
+                        const isDisliked = c.dislikes?.find(u => u.userId === userId)
+
+                        myStatus = LikeStatus.None
+                        if(isDisliked) myStatus = LikeStatus.Dislike
+                        if(isLiked) myStatus = LikeStatus.Like
+                    } else {
+                        myStatus = LikeStatus.None
+                    }
+
                     c.likesInfo = {
                         likesCount: c.likes?.length ?? 0,
                         dislikesCount: c.dislikes?.length ?? 0,
-                        myStatus: LikeStatus.None
+                        myStatus: myStatus
                         }
                     delete c.likes
                     delete c.dislikes
@@ -58,16 +71,26 @@ export const commentsQueryRepository =
                 items: output
             }
         },
-        async findCommentById (id: string) {
+        async findCommentById (id: string, userId: string | null) {
+            let myStatus: LikeStatus = LikeStatus.None
             const comment = await CommentModel.findOne({_id: new ObjectId(id)}).select('-__v').lean()
+
             if(!comment) return null
+
+            if(userId) {
+                const isLiked = comment.likes.find(v => v.userId === userId)
+                const isDisliked = comment.dislikes.find(v => v.userId === userId)
+
+                if(isDisliked) myStatus = LikeStatus.Dislike
+                if(isLiked) myStatus = LikeStatus.Like
+            }
 
             const output: CommentViewModel = {
                 ...comment,
                 likesInfo: {
                     likesCount: comment.likes?.length ?? 0,
                     dislikesCount: comment.dislikes?.length ?? 0,
-                    myStatus: LikeStatus.None
+                    myStatus: myStatus
                 }
             }
 

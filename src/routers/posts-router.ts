@@ -9,7 +9,7 @@ import {postsService} from "../domain/posts-service";
 import {postsQueryRepository} from "../repositories/query-repositories/posts-query-repository";
 import {RequestWithParamsAndQuery, RequestWithQuery} from "../models/request-types";
 import {QueryPostsModel} from "../models/query-models/query-posts-model";
-import {authMiddleware} from "../middlewares/autorization-middleware";
+import {authMiddleware, checkUserIdByJWT} from "../middlewares/autorization-middleware";
 import {commentsService} from "../domain/comments-service";
 import {commentsQueryRepository} from "../repositories/query-repositories/comments-query-repository";
 import {QueryCommentsModel} from "../models/query-models/query-comments-model";
@@ -29,7 +29,7 @@ postsRouter.get('/', async (req: RequestWithQuery<QueryPostsModel>, res: Respons
     res.send(posts);
 })
 
-postsRouter.get('/:id', isMongoId, checkErrors, async (req: Request, res: Response) => {
+postsRouter.get('/:id', isMongoId, checkUserIdByJWT, checkErrors, async (req: Request, res: Response) => {
 
     const post = await postsService.findPostById(req.params.id);
     if(!post) {
@@ -42,6 +42,7 @@ postsRouter.get('/:id', isMongoId, checkErrors, async (req: Request, res: Respon
 
 postsRouter.get('/:id/comments',
     isMongoId,
+    checkUserIdByJWT,
     checkErrors,
     async (req: RequestWithParamsAndQuery<{id: string}, QueryCommentsModel>, res: Response) => {
         const post = await postsService.findPostById(req.params.id)

@@ -1,7 +1,7 @@
 import {Router, Request, Response} from "express";
 import {commentsQueryRepository} from "../repositories/query-repositories/comments-query-repository";
 import {commentsService} from "../domain/comments-service";
-import {authMiddleware} from "../middlewares/autorization-middleware";
+import {authMiddleware, checkUserIdByJWT} from "../middlewares/autorization-middleware";
 import {checkErrors} from "../middlewares/check-errors";
 import {commentBodyValidationMiddleware} from "../middlewares/body-validation/body-validation-middleware";
 import {isMongoId} from "../middlewares/params-validation/common-validaton-middleware";
@@ -9,8 +9,9 @@ import {likeStatus} from "../middlewares/body-validation/common-validation-middl
 
 export const commentsRouter = Router({})
 
-commentsRouter.get('/:id', isMongoId, async (req: Request, res: Response) => {
-    const comment = await commentsQueryRepository.findCommentById(req.params.id)
+commentsRouter.get('/:id', isMongoId, checkUserIdByJWT, async (req: Request, res: Response) => {
+    const userId = req.userId ?? null
+    const comment = await commentsQueryRepository.findCommentById(req.params.id, userId)
 
     if(!comment) {
         res.sendStatus(404)
