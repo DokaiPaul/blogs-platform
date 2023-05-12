@@ -55,7 +55,10 @@ postsRouter.post('/:id/comments',
     commentBodyValidationMiddleware,
     checkErrors,
     async (req: Request, res: Response) => {
-    const post = await postsService.findPostById(req.params.id)
+
+    console.log(req.body)
+
+        const post = await postsService.findPostById(req.params.id)
 
     if(!post) {
         res.sendStatus(404)
@@ -72,6 +75,8 @@ postsRouter.post('/',
     postBodyValidationMiddleware,
     checkErrors,
     async (req: Request, res: Response) => {
+
+    console.log(req.body)
 
         const newPost = await postsService.createPost(req.body)
         if(!newPost) {
