@@ -52,7 +52,7 @@ blogsRouter.post('/' ,
     async (req: Request, res: Response) => {
 
         const newBlog = await blogsService.createBlog(req.body)
-
+        console.log(newBlog)
         res.status(201).json(newBlog);
 })
 
