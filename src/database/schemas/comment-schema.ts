@@ -7,6 +7,8 @@ export const CommentSchema = new mongoose.Schema<CommentsDbModel>({
         userId: {type: String, required: true},
         userLogin: {type: String, required: true}
     },
+    likes: {type: [], required: true},
+    dislikes: {type: [], required: true},
     createdAt: {type: String, required: true},
     postId: {type: String, required: true}
 })

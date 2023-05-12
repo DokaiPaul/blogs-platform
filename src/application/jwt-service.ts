@@ -7,12 +7,12 @@ const secret = process.env.JWT_SECRET || '123'
 export const jwtService =
     {
         async createAccessJWT (userId: string) {
-            const token = jwt.sign({userId}, secret, {expiresIn: '10s'})
+            const token = jwt.sign({userId}, secret, {expiresIn: '300s'})
 
             return token;
         },
         async createRefreshJWT(deviceId: string, userId: string) {
-            const token = jwt.sign({deviceId, userId}, secret, {expiresIn: '20s'})
+            const token = jwt.sign({deviceId, userId}, secret, {expiresIn: '10d'})
 
             return token;
         },

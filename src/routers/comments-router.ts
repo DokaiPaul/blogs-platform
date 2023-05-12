@@ -5,6 +5,7 @@ import {authMiddleware} from "../middlewares/autorization-middleware";
 import {checkErrors} from "../middlewares/check-errors";
 import {commentBodyValidationMiddleware} from "../middlewares/body-validation/body-validation-middleware";
 import {isMongoId} from "../middlewares/params-validation/common-validaton-middleware";
+import {likeStatus} from "../middlewares/body-validation/common-validation-middleware";
 
 export const commentsRouter = Router({})
 
@@ -39,6 +40,34 @@ commentsRouter.put('/:id',
     }
 
     res.sendStatus(204)
+})
+
+//todo add sending like status (none, like, dislike)
+commentsRouter.put('/:id/like-status',
+    isMongoId,
+    authMiddleware,
+    likeStatus,
+    checkErrors,
+    async (req: Request, res: Response) => {
+
+        if(!req.userId) {
+            res.sendStatus(401)
+            return
+        }
+
+        const statusTransferObject = {
+            status: req.body.likeStatus,
+            userId: req.userId,
+            commentId: req.params.id
+        }
+        const result = await commentsService.setLikeDislikeStatus(statusTransferObject)
+
+        if(!result) {
+            res.sendStatus(404)
+            return
+        }
+
+        res.sendStatus(204)
 })
 
 commentsRouter.delete('/:id',

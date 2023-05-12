@@ -125,3 +125,7 @@ export const recoveryCode = body('recoveryCode')
     .bail()
     .isString()
     .withMessage('recovery code should be a string')
+
+export const likeStatus = body('likeStatus')
+    .matches(/^None$|^Like$|^Dislike$/)
+    .withMessage('Status should be valid')

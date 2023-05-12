@@ -5,7 +5,7 @@ import {postsRepository} from "../repositories/posts-repository";
 import {blogsService} from "./blogs-service";
 import {BlogsType} from "../models/view-models/blogs-view-model";
 import {PostsType} from "../models/view-models/posts-view-model";
-import {PostModel} from "../database/models/post-model";
+import {BlogModel} from "../database/models/blog-model";
 
 export const postsService = {
     async findAllPosts (): Promise<PostsType[] | {}> {
@@ -33,7 +33,7 @@ export const postsService = {
     },
     async createPost (body: PostsType): Promise<PostsType> {
 
-        const blog: BlogsType | null = await PostModel.findOne({_id: new ObjectId(body.blogId)});
+        const blog: BlogsType | null = await BlogModel.findOne({_id: new ObjectId(body.blogId)});
 
         const newPost: PostsType = {
             title: body.title,
