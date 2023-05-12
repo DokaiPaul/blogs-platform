@@ -56,17 +56,20 @@ commentsRouter.put('/:id/like-status',
             return
         }
 
+        const comment = await commentsQueryRepository.findCommentById(req.params.id, req.userId)
+
+        if(!comment) {
+            res.sendStatus(404)
+            return
+        }
+
         const statusTransferObject = {
             status: req.body.likeStatus,
             userId: req.userId,
             commentId: req.params.id
         }
-        const result = await commentsService.setLikeDislikeStatus(statusTransferObject)
 
-        if(!result) {
-            res.sendStatus(404)
-            return
-        }
+        await commentsService.setLikeDislikeStatus(statusTransferObject)
 
         res.sendStatus(204)
 })
