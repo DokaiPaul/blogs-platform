@@ -5,6 +5,7 @@ import {PostInputType} from "../models/input-models/posts-input-model";
 import {postsRepository} from "../repositories/posts-repository";
 import {PostsType} from "../models/view-models/posts-view-model";
 import {BlogsType} from "../models/view-models/blogs-view-model";
+import {ObjectId} from "mongodb";
 
 export const blogsService = {
     async findAllBlogs (): Promise<BlogsType[] | {}> {
@@ -27,6 +28,7 @@ export const blogsService = {
     async createBlog (body: BlogInputType): Promise<BlogsType> {
 
         const newBlog = {
+            _id: new ObjectId(),
             name: body.name,
             description: body.description,
             websiteUrl: body.websiteUrl,
@@ -46,6 +48,7 @@ export const blogsService = {
         if(!blog) return null;
 
         const newPost: PostsType = {
+            _id: new ObjectId(),
             title: body.title,
             shortDescription: body.shortDescription,
             content: body.content,

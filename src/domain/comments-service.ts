@@ -6,7 +6,7 @@ import {usersQueryRepository} from "../repositories/query-repositories/users-que
 import {commentsQueryRepository} from "../repositories/query-repositories/comments-query-repository";
 import {CommentsDbModel} from "../models/mongo-db-models/comments-db-model";
 import {ChangeStatusTransferModel} from "../models/additional-types/data-transfer-object";
-import {likeStatus} from "../middlewares/body-validation/common-validation-middleware";
+import {ObjectId} from "mongodb";
 
 export const commentsService =
     {
@@ -14,6 +14,7 @@ export const commentsService =
                 if(!req.userId) return null
                 const user = await usersQueryRepository.findUserById(req.userId)
                 const newComment: CommentsDbModel = {
+                        _id: new ObjectId(),
                         content: req.body!.content,
                         commentatorInfo: {
                                 userId: user!.userId,
@@ -44,8 +45,9 @@ export const commentsService =
 
             const commentsId = req.params.id
             const content = req.body.content
+            const userId = req.userId ?? null
 
-            const comment = await commentsQueryRepository.findCommentById(commentsId)
+            const comment = await commentsQueryRepository.findCommentById(commentsId, userId)
 
             if(!comment) return 'wrong id'
 
@@ -59,7 +61,7 @@ export const commentsService =
             return 'not updated'
         },
         async deleteComment (req: Request): Promise<string> {
-            const comment = await commentsQueryRepository.findCommentById(req.params.id)
+            const comment = await commentsQueryRepository.findCommentById(req.params.id, null)
 
             if(!comment) return 'wrong id'
 

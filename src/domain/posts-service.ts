@@ -36,6 +36,7 @@ export const postsService = {
         const blog: BlogsType | null = await BlogModel.findOne({_id: new ObjectId(body.blogId)});
 
         const newPost: PostsType = {
+            _id: new ObjectId(),
             title: body.title,
             shortDescription: body.shortDescription,
             content: body.content,

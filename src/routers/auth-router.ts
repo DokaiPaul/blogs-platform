@@ -14,6 +14,7 @@ import {checkRateLimit} from "../middlewares/rate-limit-middleware";
 import {v4 as uuidv4} from "uuid";
 import {ActiveSessionDbModel} from "../models/mongo-db-models/active-session-db-model";
 import {activeSessionsService} from "../domain/active-sessions-service";
+import {ObjectId} from "mongodb";
 
 export const authRouter = Router({})
 
@@ -28,6 +29,7 @@ authRouter.post('/login', checkRateLimit ,body('loginOrEmail').isString(), passw
         }
 
         const sessionInfo: ActiveSessionDbModel = {
+            _id: new ObjectId(),
             deviceId: uuidv4(),
             userId: user._id.toString(),
             ip,
