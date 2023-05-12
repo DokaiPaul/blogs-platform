@@ -17,6 +17,7 @@ import {isMongoId} from "../middlewares/params-validation/common-validaton-middl
 
 const logRequest = async (req: Request, res: Response, next: NextFunction) => {
     console.log(req.body)
+
     next()
 }
 
