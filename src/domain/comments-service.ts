@@ -35,6 +35,8 @@ export const commentsService =
                         myStatus: LikeStatus.None
                     }
                 }
+                delete output.likes
+                delete output.dislikes
                 changeKeyName(output, '_id', 'id')
 
                 delete output.postId

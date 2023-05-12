@@ -20,7 +20,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
 
 export const checkUserIdByJWT = async (req: Request, res: Response, next: NextFunction) => {
     if(!req.headers.authorization) {
-        res.sendStatus(401)
+        next()
         return
     }
 
@@ -29,8 +29,7 @@ export const checkUserIdByJWT = async (req: Request, res: Response, next: NextFu
     const userId = await jwtService.getUserIdByJWT(token)
     if(userId) {
         req.userId = userId
-        next()
-        return
     }
-    res.sendStatus(401)
+    next()
+    return
 }
