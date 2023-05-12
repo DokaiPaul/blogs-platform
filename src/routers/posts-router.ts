@@ -1,4 +1,4 @@
-import {Router, Response, Request} from "express";
+import {Router, Response, Request, NextFunction} from "express";
 import {adminAuthMiddleware} from "../middlewares/admin-auth-middleware";
 import {checkErrors} from "../middlewares/check-errors";
 import {
@@ -14,6 +14,11 @@ import {commentsService} from "../domain/comments-service";
 import {commentsQueryRepository} from "../repositories/query-repositories/comments-query-repository";
 import {QueryCommentsModel} from "../models/query-models/query-comments-model";
 import {isMongoId} from "../middlewares/params-validation/common-validaton-middleware";
+
+const logRequest = (req: Request, res: Response, next: NextFunction) => {
+    console.log(req.body)
+    next()
+}
 
 export const postsRouter = Router({});
 
@@ -50,13 +55,12 @@ postsRouter.get('/:id/comments',
 })
 
 postsRouter.post('/:id/comments',
+    logRequest,
     isMongoId,
     authMiddleware,
     commentBodyValidationMiddleware,
     checkErrors,
     async (req: Request, res: Response) => {
-
-    console.log(req.body)
 
         const post = await postsService.findPostById(req.params.id)
 
@@ -71,12 +75,11 @@ postsRouter.post('/:id/comments',
 })
 
 postsRouter.post('/',
+    logRequest,
     adminAuthMiddleware,
     postBodyValidationMiddleware,
     checkErrors,
     async (req: Request, res: Response) => {
-
-    console.log(req.body)
 
         const newPost = await postsService.createPost(req.body)
         if(!newPost) {
