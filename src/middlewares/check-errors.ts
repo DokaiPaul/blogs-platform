@@ -4,7 +4,6 @@ import {errorMsg} from "../utils/errors/errors";
 import {ErrorMessages} from "../models/additional-types/errors-types";
 
 export const checkErrors = (req: Request, res: Response, next: NextFunction) => {
-    console.log(req.body)
 
     const errorsArr: ErrorMessages = {
         "errorsMessages": []
