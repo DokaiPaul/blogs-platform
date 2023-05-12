@@ -15,7 +15,7 @@ import {commentsQueryRepository} from "../repositories/query-repositories/commen
 import {QueryCommentsModel} from "../models/query-models/query-comments-model";
 import {isMongoId} from "../middlewares/params-validation/common-validaton-middleware";
 
-const logRequest = (req: Request, res: Response, next: NextFunction) => {
+const logRequest = async (req: Request, res: Response, next: NextFunction) => {
     console.log(req.body)
     next()
 }
