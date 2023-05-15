@@ -64,7 +64,7 @@ export const blogsService = {
         await postsRepository.createPost(newPost)
         changeKeyName(newPost, '_id', 'id')
 
-        const output = {
+        const output: PostsType = {
             ...newPost,
             extendedLikesInfo: {
                 likesCount: 0,
@@ -73,6 +73,10 @@ export const blogsService = {
                 newestLikes: []
             }
         }
+
+        delete output.likes
+        delete output.dislikes
+
         return output;
     },
     async updateBlog (id: string , body:BlogInputType): Promise<boolean> {

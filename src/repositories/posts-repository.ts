@@ -48,7 +48,7 @@ export const postsRepository = {
             {_id: new ObjectId(postId)},
             {$push: {[status]: {
                         userId: userId,
-                        addedAt: new Date(),
+                        addedAt: new Date().toISOString(),
                         login: login
                     }}
             })

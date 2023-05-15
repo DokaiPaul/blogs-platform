@@ -30,7 +30,6 @@ export const postsService = {
 
         let post = await postsRepository.findPostById(id);
         if(!post) return null;
-        changeKeyName(post, '_id', 'id')
 
         let myStatus = LikeStatus.None
         const latestLikes = await postsRepository.findThreeNewestLikes(id)
