@@ -5,7 +5,7 @@ import {commentsRepository} from "../repositories/comments-repository";
 import {usersQueryRepository} from "../repositories/query-repositories/users-query-repository";
 import {commentsQueryRepository} from "../repositories/query-repositories/comments-query-repository";
 import {CommentsDbModel} from "../models/mongo-db-models/comments-db-model";
-import {ChangeStatusTransferModel} from "../models/additional-types/data-transfer-object";
+import {ChangeCommentStatusTransferModel} from "../models/additional-types/data-transfer-object";
 import {ObjectId} from "mongodb";
 
 export const commentsService =
@@ -75,9 +75,9 @@ export const commentsService =
 
             return 'not deleted'
         },
-        async setLikeDislikeStatus (statusData: ChangeStatusTransferModel): Promise<boolean | null> {
+        async setLikeDislikeStatus (statusData: ChangeCommentStatusTransferModel): Promise<boolean | null> {
             const {status, commentId, userId} = statusData
-            //todo complete this function
+
             let currentStatus = 'None'
             const isAlreadyLiked = await commentsRepository.findLikeByUser(userId, commentId)
             if(isAlreadyLiked) currentStatus = 'Like'
@@ -95,22 +95,22 @@ export const commentsService =
             const result = await this.changeCurrentStatus(statusData)
             return result
         },
-        async addNewStatus ({status, userId, commentId}: ChangeStatusTransferModel): Promise<boolean | null> {
+        async addNewStatus ({status, userId, commentId, login}: ChangeCommentStatusTransferModel): Promise<boolean | null> {
             if(status === 'Like') {
-                const result = await commentsRepository.addLike(userId, commentId)
+                const result = await commentsRepository.addLike(userId, commentId, login)
                 if(!result) return false
                 return true
             }
             if(status === 'Dislike') {
-                const result = await commentsRepository.addDislike(userId, commentId)
+                const result = await commentsRepository.addDislike(userId, commentId, login)
                 if(!result) return false
                 return true
             }
             return null
         },
-        async changeCurrentStatus ({status, userId, commentId}: ChangeStatusTransferModel): Promise<boolean | null> {
+        async changeCurrentStatus ({status, userId, commentId, login}: ChangeCommentStatusTransferModel): Promise<boolean | null> {
             if(status === 'Like') {
-                const result = await  commentsRepository.addLike(userId, commentId)
+                const result = await  commentsRepository.addLike(userId, commentId, login)
                 if(!result) return false
 
                 const isRemoved = await commentsRepository.removeDislike(userId, commentId)
@@ -119,7 +119,7 @@ export const commentsService =
                 return true
             }
             if(status === 'Dislike') {
-                const result = await  commentsRepository.addDislike(userId, commentId)
+                const result = await  commentsRepository.addDislike(userId, commentId, login)
                 if(!result) return false
 
                 const isRemoved = await commentsRepository.removeLike(userId, commentId)

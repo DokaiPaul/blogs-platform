@@ -6,14 +6,19 @@ import {PostsType} from "../../models/view-models/posts-view-model";
 import {Paginator} from "../../models/view-models/paginator-view-model";
 import {SortOrder} from "mongoose";
 import {PostModel} from "../../database/models/post-model";
+import {PostsDbModel} from "../../models/mongo-db-models/posts-db-model";
+import {LikeStatus} from "../../models/view-models/comments-view-model";
+import {postsRepository} from "../posts-repository";
+
 
 export const postsQueryRepository = {
-    async findPosts (req: RequestWithQuery<QueryPostsModel>): Promise<Paginator<PostsType[]> | null | undefined> {
+    async findPosts (req: RequestWithQuery<QueryPostsModel>): Promise<Paginator<PostsType[]>> {
         const {sortBy, sortDir, pageNum, pageSize} = parsePostsQuery(req.query);
 
-        let posts: PostsType[] | null;
+        let posts: PostsDbModel[];
         let filter = {};
         let sort = {[sortBy]: sortDir as SortOrder}
+        let userId = req.userId ?? null
 
         posts = await PostModel.find(filter)
             .sort(sort)
@@ -22,9 +27,33 @@ export const postsQueryRepository = {
             .select('-__v')
             .lean()
 
-        if(!posts) posts = []
+        const output = [...posts] as PostsType[]
+        for (const p of output) {
+            let myStatus = LikeStatus.None
+            const latestLikes = await postsRepository.findThreeNewestLikes(p._id!.toString())
 
-        posts.forEach(p => changeKeyName(p, '_id','id'))
+            if (userId) {
+                const isLiked = p.likes?.find(u => u.userId.toString() === userId)
+                const isDisliked = p.dislikes?.find(u => u.userId.toString() === userId)
+
+                if (isDisliked) myStatus = LikeStatus.Dislike
+                if (isLiked) myStatus = LikeStatus.Like
+            }
+
+            p.extendedLikesInfo = {
+                likesCount: p.likes?.length ?? 0,
+                dislikesCount: p.dislikes?.length ?? 0,
+                myStatus: myStatus,
+                // @ts-ignore
+                newestLikes: latestLikes[0].likes ?? []
+            }
+
+            delete p.likes
+            delete p.dislikes
+
+            changeKeyName(p, '_id', 'id')
+        }
+
 
         const totalMatchedPosts = await PostModel.countDocuments(filter)
         const totalPages = Math.ceil(totalMatchedPosts / pageSize)
@@ -34,7 +63,7 @@ export const postsQueryRepository = {
             page: pageNum,
             pageSize: pageSize,
             totalCount: totalMatchedPosts,
-            items: posts
+            items: output ?? []
         };
     },
     async findPostsInBlog (req: RequestWithParamsAndQuery<{id: string}, QueryPostsModel>): Promise<Paginator<PostsType[]> | null | undefined>{

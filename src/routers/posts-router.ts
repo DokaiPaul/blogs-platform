@@ -1,4 +1,4 @@
-import {Router, Response, Request, NextFunction} from "express";
+import {Router, Response, Request} from "express";
 import {adminAuthMiddleware} from "../middlewares/admin-auth-middleware";
 import {checkErrors} from "../middlewares/check-errors";
 import {
@@ -14,24 +14,23 @@ import {commentsService} from "../domain/comments-service";
 import {commentsQueryRepository} from "../repositories/query-repositories/comments-query-repository";
 import {QueryCommentsModel} from "../models/query-models/query-comments-model";
 import {isMongoId} from "../middlewares/params-validation/common-validaton-middleware";
+import {likeStatus} from "../middlewares/body-validation/common-validation-middleware";
+import {usersQueryRepository} from "../repositories/query-repositories/users-query-repository";
 
-const logRequest = async (req: Request, res: Response, next: NextFunction) => {
-    console.log(req.body, req.headers)
-
-    next()
-}
 
 export const postsRouter = Router({});
 
-postsRouter.get('/', async (req: RequestWithQuery<QueryPostsModel>, res: Response) => {
+postsRouter.get('/', checkUserIdByJWT, async (req: RequestWithQuery<QueryPostsModel>, res: Response) => {
 
     const posts = await postsQueryRepository.findPosts(req);
     res.send(posts);
 })
 
 postsRouter.get('/:id', isMongoId, checkUserIdByJWT, checkErrors, async (req: Request, res: Response) => {
+    let userId = null;
+    if(req.userId) userId = req.userId
 
-    const post = await postsService.findPostById(req.params.id);
+    const post = await postsService.findPostById(req.params.id, userId);
     if(!post) {
         res.sendStatus(404);
         return;
@@ -45,7 +44,7 @@ postsRouter.get('/:id/comments',
     checkUserIdByJWT,
     checkErrors,
     async (req: RequestWithParamsAndQuery<{id: string}, QueryCommentsModel>, res: Response) => {
-        const post = await postsService.findPostById(req.params.id)
+        const post = await postsService.findPostById(req.params.id, null)
 
         if(!post) {
             res.sendStatus(404)
@@ -57,14 +56,13 @@ postsRouter.get('/:id/comments',
 })
 
 postsRouter.post('/:id/comments',
-    logRequest,
     isMongoId,
     authMiddleware,
     commentBodyValidationMiddleware,
     checkErrors,
     async (req: Request, res: Response) => {
 
-        const post = await postsService.findPostById(req.params.id)
+        const post = await postsService.findPostById(req.params.id, null)
 
     if(!post) {
         res.sendStatus(404)
@@ -77,7 +75,6 @@ postsRouter.post('/:id/comments',
 })
 
 postsRouter.post('/',
-    logRequest,
     adminAuthMiddleware,
     postBodyValidationMiddleware,
     checkErrors,
@@ -107,6 +104,43 @@ postsRouter.put('/:id',
 
         res.sendStatus(204);
 })
+
+postsRouter.put('/:id/like-status',
+    isMongoId,
+    authMiddleware,
+    likeStatus,
+    checkErrors,
+    async (req: Request, res: Response) => {
+
+        if(!req.userId) {
+            res.sendStatus(401)
+            return
+        }
+
+        const post = await postsService.findPostById(req.params.id, null)
+        const userLogin = await usersQueryRepository.findUserById(req.userId)
+
+        if(!userLogin?.login) {
+            res.sendStatus(401)
+            return
+        }
+
+        if(!post) {
+            res.sendStatus(404)
+            return
+        }
+
+        const statusTransferObject = {
+            status: req.body.likeStatus,
+            userId: req.userId,
+            postId: req.params.id,
+            login: userLogin.login
+        }
+
+        await postsService.setLikeDislikeStatus(statusTransferObject)
+
+        res.sendStatus(204)
+    })
 
 postsRouter.delete('/:id',
     isMongoId,

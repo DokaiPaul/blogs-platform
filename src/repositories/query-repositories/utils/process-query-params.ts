@@ -4,6 +4,7 @@ import {BlogsType} from "../../../models/view-models/blogs-view-model";
 import {PostsType} from "../../../models/view-models/posts-view-model";
 import {QueryUsersModel} from "../../../models/query-models/query-users-model";
 import {UsersViewModel} from "../../../models/view-models/users-view-model";
+import {LikeStatus} from "../../../models/view-models/comments-view-model";
 
 type ProcessedQuery = {
     searchByTerm?: string | null,
@@ -52,7 +53,7 @@ export const parsePostsQuery = (q: QueryPostsModel) => {
     let pageNum = +q.pageNumber || 1
     let pageSize = +q.pageSize || 10
 
-    const validBlog: PostsType =
+    const validPost: PostsType =
         {
             id: 'string',
             title: 'string',
@@ -60,10 +61,18 @@ export const parsePostsQuery = (q: QueryPostsModel) => {
             content: 'string',
             createdAt: 'string',
             blogId: 'string',
-            blogName: 'string'
+            blogName: 'string',
+            likes: [],
+            dislikes: [],
+            extendedLikesInfo: {
+                likesCount: 0,
+                dislikesCount: 0,
+                myStatus: LikeStatus.None,
+                newestLikes: []
+            }
         }
 
-    if(!validBlog.hasOwnProperty(sortBy)) sortBy = 'createdAt'
+    if(!validPost.hasOwnProperty(sortBy)) sortBy = 'createdAt'
     if(sortDir !== 'asc') sortDir = 'desc'
     if(Number.isNaN(pageNum)) pageNum = 1
     if(Number.isNaN(pageSize)) {

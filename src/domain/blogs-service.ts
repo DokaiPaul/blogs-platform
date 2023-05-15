@@ -6,6 +6,8 @@ import {postsRepository} from "../repositories/posts-repository";
 import {PostsType} from "../models/view-models/posts-view-model";
 import {BlogsType} from "../models/view-models/blogs-view-model";
 import {ObjectId} from "mongodb";
+import {LikeStatus} from "../models/view-models/comments-view-model";
+import {PostsDbModel} from "../models/mongo-db-models/posts-db-model";
 
 export const blogsService = {
     async findAllBlogs (): Promise<BlogsType[] | {}> {
@@ -47,7 +49,7 @@ export const blogsService = {
 
         if(!blog) return null;
 
-        const newPost: PostsType = {
+        const newPost: PostsDbModel = {
             _id: new ObjectId(),
             title: body.title,
             shortDescription: body.shortDescription,
@@ -55,11 +57,23 @@ export const blogsService = {
             blogId: id,
             blogName: blog.name,
             createdAt: new Date().toISOString(),
+            likes: [],
+            dislikes: [],
         }
 
         await postsRepository.createPost(newPost)
         changeKeyName(newPost, '_id', 'id')
-        return newPost;
+
+        const output = {
+            ...newPost,
+            extendedLikesInfo: {
+                likesCount: 0,
+                dislikesCount: 0,
+                myStatus: LikeStatus.None,
+                newestLikes: []
+            }
+        }
+        return output;
     },
     async updateBlog (id: string , body:BlogInputType): Promise<boolean> {
 

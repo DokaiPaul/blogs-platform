@@ -6,6 +6,7 @@ import {checkErrors} from "../middlewares/check-errors";
 import {commentBodyValidationMiddleware} from "../middlewares/body-validation/body-validation-middleware";
 import {isMongoId} from "../middlewares/params-validation/common-validaton-middleware";
 import {likeStatus} from "../middlewares/body-validation/common-validation-middleware";
+import {usersQueryRepository} from "../repositories/query-repositories/users-query-repository";
 
 export const commentsRouter = Router({})
 
@@ -57,16 +58,23 @@ commentsRouter.put('/:id/like-status',
         }
 
         const comment = await commentsQueryRepository.findCommentById(req.params.id, req.userId)
+        const userLogin = await usersQueryRepository.findUserById(req.userId)
 
         if(!comment) {
             res.sendStatus(404)
             return
         }
 
+        if(!userLogin?.login) {
+            res.sendStatus(500)
+            return
+        }
+
         const statusTransferObject = {
             status: req.body.likeStatus,
             userId: req.userId,
-            commentId: req.params.id
+            commentId: req.params.id,
+            login: userLogin.login
         }
 
         await commentsService.setLikeDislikeStatus(statusTransferObject)

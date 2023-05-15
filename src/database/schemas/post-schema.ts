@@ -7,5 +7,7 @@ export const PostSchema = new mongoose.Schema<PostsDbModel>({
     content: {type: String, required: true},
     blogId: {type: String, required: true},
     blogName: {type: String, required: true},
-    createdAt: {type: String, required: true}
+    createdAt: {type: String, required: true},
+    likes: {type: [], required: true},
+    dislikes: {type: [], required: true}
 })

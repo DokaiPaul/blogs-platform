@@ -1,3 +1,5 @@
+import {StatusData} from "../mongo-db-models/comments-db-model";
+
 export type CommentViewModel=
     {
         id?: string,
@@ -6,8 +8,8 @@ export type CommentViewModel=
         likesInfo: LikesInfo,
         createdAt: string
         postId?: string,
-        likes?: {userId: string, date: Date}[],
-        dislikes?: {userId: string, date: Date}[]
+        likes?: StatusData[],
+        dislikes?: StatusData[]
     }
 
 export type CommentatorInfo =

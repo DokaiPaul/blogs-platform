@@ -6,9 +6,15 @@ export type CommentsDbModel =
         _id?: ObjectId,
         content: string,
         commentatorInfo: CommentatorInfo,
-        likes: {userId: string, date: Date}[],
-        dislikes: {userId: string, date: Date}[],
+        likes: StatusData[],
+        dislikes: StatusData[],
         createdAt: string,
         postId?: string,
         likesInfo?: LikesInfo
+    }
+
+export type StatusData = {
+        userId: string,
+        addedAt: string,
+        login?: string
     }
