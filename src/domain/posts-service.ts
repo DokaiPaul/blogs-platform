@@ -2,7 +2,6 @@ import {PostInputType} from "../models/input-models/posts-input-model";
 import {changeKeyName} from "../utils/object-operations";
 import {ObjectId} from "mongodb";
 import {postsRepository} from "../repositories/posts-repository";
-import {blogsService} from "./blogs-service";
 import {BlogsType} from "../models/view-models/blogs-view-model";
 import {PostsType} from "../models/view-models/posts-view-model";
 import {BlogModel} from "../database/models/blog-model";
@@ -11,28 +10,13 @@ import {PostsDbModel} from "../models/mongo-db-models/posts-db-model";
 import {LikeStatus} from "../models/view-models/comments-view-model";
 
 export const postsService = {
-    async findAllPosts (): Promise<PostsType[] | {}> {
-
-        const posts = await postsRepository.findAllPosts();
-        if(!posts) return {};
-        posts.forEach(b => changeKeyName(b, '_id','id'));
-
-        return posts;
-    },
-    async findPostsInBlog (id: string): Promise<PostsType[] | null | undefined> {
-        const blog = await blogsService.findBlogById(id);
-
-        if(!blog) return null
-
-        return await postsRepository.findPostsInBlog(id)
-    },
     async findPostById (id: string, userId: string | null): Promise<PostsType | null> {
 
         let post = await postsRepository.findPostById(id);
         if(!post) return null;
 
         let myStatus = LikeStatus.None
-        const latestLikes = await postsRepository.findThreeNewestLikes(id)
+        const latestLikes = post.likes?.sort((a, b) => Date.parse(b.addedAt) - Date.parse(a.addedAt))
 
         if (userId) {
             const isLiked = post.likes?.find(u => u.userId.toString() === userId)
@@ -46,8 +30,7 @@ export const postsService = {
             likesCount: post.likes?.length ?? 0,
             dislikesCount: post.dislikes?.length ?? 0,
             myStatus: myStatus,
-            // @ts-ignore
-            newestLikes: latestLikes[0].likes ?? []
+            newestLikes: latestLikes ?? []
         }
 
         delete post.likes

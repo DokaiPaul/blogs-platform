@@ -8,7 +8,6 @@ import {SortOrder} from "mongoose";
 import {PostModel} from "../../database/models/post-model";
 import {PostsDbModel} from "../../models/mongo-db-models/posts-db-model";
 import {LikeStatus} from "../../models/view-models/comments-view-model";
-import {postsRepository} from "../posts-repository";
 
 
 export const postsQueryRepository = {
@@ -30,7 +29,7 @@ export const postsQueryRepository = {
         const output = [...posts] as PostsType[]
         for (const p of output) {
             let myStatus = LikeStatus.None
-            const latestLikes = await postsRepository.findThreeNewestLikes(p._id!.toString())
+            const latestLikes = p.likes?.sort((a, b) => Date.parse(b.addedAt) - Date.parse(a.addedAt)).slice(0, 3)
 
             if (userId) {
                 const isLiked = p.likes?.find(u => u.userId.toString() === userId)
@@ -44,8 +43,7 @@ export const postsQueryRepository = {
                 likesCount: p.likes?.length ?? 0,
                 dislikesCount: p.dislikes?.length ?? 0,
                 myStatus: myStatus,
-                // @ts-ignore
-                newestLikes: latestLikes[0].likes ?? []
+                newestLikes: latestLikes ?? []
             }
 
             delete p.likes
@@ -68,6 +66,7 @@ export const postsQueryRepository = {
     },
     async findPostsInBlog (req: RequestWithParamsAndQuery<{id: string}, QueryPostsModel>): Promise<Paginator<PostsType[]> | null | undefined>{
         const {sortBy, sortDir, pageNum, pageSize}= parsePostsQuery(req.query);
+        let userId = req.userId ?? null
 
         let posts: PostsType[] | null;
         let sort = {[sortBy]: sortDir as SortOrder}
@@ -82,7 +81,31 @@ export const postsQueryRepository = {
 
         if(!posts || posts.length < 1) return null;
 
-        posts.forEach(p => changeKeyName(p, '_id','id'))
+        const output = [...posts] as PostsType[]
+        for (const p of output) {
+            let myStatus = LikeStatus.None
+            const latestLikes = p.likes?.sort((a, b) => Date.parse(b.addedAt) - Date.parse(a.addedAt)).slice(0, 3)
+
+            if (userId) {
+                const isLiked = p.likes?.find(u => u.userId.toString() === userId)
+                const isDisliked = p.dislikes?.find(u => u.userId.toString() === userId)
+
+                if (isDisliked) myStatus = LikeStatus.Dislike
+                if (isLiked) myStatus = LikeStatus.Like
+            }
+
+            p.extendedLikesInfo = {
+                likesCount: p.likes?.length ?? 0,
+                dislikesCount: p.dislikes?.length ?? 0,
+                myStatus: myStatus,
+                newestLikes: latestLikes ?? []
+            }
+
+            delete p.likes
+            delete p.dislikes
+
+            changeKeyName(p, '_id', 'id')
+        }
 
         const totalMatchedPosts = await PostModel.countDocuments(filter)
         const totalPages = Math.ceil(totalMatchedPosts / pageSize)
