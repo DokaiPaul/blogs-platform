@@ -9,6 +9,7 @@ import {blogsQueryRepository} from "../repositories/query-repositories/blogs-que
 import {QueryPostsModel} from "../models/query-models/query-posts-model";
 import {postsQueryRepository} from "../repositories/query-repositories/posts-query-repository";
 import {isMongoId} from "../middlewares/params-validation/common-validaton-middleware";
+import {checkUserIdByJWT} from "../middlewares/autorization-middleware";
 
 export const blogsRouter = Router({})
 
@@ -32,7 +33,7 @@ blogsRouter.get('/:id', isMongoId, checkErrors,
     res.send(blog);
 })
 
-blogsRouter.get('/:id/posts', isMongoId, checkErrors,
+blogsRouter.get('/:id/posts', isMongoId, checkUserIdByJWT, checkErrors,
     async (req: RequestWithParamsAndQuery<{id: string}, QueryPostsModel>, res: Response) => {
 
     const blogs = await postsQueryRepository.findPostsInBlog(req);
