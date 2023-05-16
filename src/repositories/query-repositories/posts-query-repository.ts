@@ -68,7 +68,7 @@ export const postsQueryRepository = {
         const {sortBy, sortDir, pageNum, pageSize}= parsePostsQuery(req.query);
         let userId = req.userId ?? null
 
-        let posts: PostsType[] | null;
+        let posts: PostsType[];
         let sort = {[sortBy]: sortDir as SortOrder}
         const filter = {blogId: req.params.id}
 
@@ -86,6 +86,7 @@ export const postsQueryRepository = {
             let myStatus = LikeStatus.None
             const latestLikes = p.likes?.sort((a, b) => Date.parse(b.addedAt) - Date.parse(a.addedAt)).slice(0, 3)
 
+            changeKeyName(p, '_id', 'id')
             if (userId) {
                 const isLiked = p.likes?.find(u => u.userId.toString() === userId)
                 const isDisliked = p.dislikes?.find(u => u.userId.toString() === userId)
@@ -103,8 +104,6 @@ export const postsQueryRepository = {
 
             delete p.likes
             delete p.dislikes
-
-            changeKeyName(p, '_id', 'id')
         }
 
         const totalMatchedPosts = await PostModel.countDocuments(filter)
@@ -115,7 +114,7 @@ export const postsQueryRepository = {
             page: pageNum,
             pageSize: pageSize,
             totalCount: totalMatchedPosts,
-            items: posts
+            items: output
         };
     }
 }

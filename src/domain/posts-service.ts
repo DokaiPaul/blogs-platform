@@ -16,7 +16,7 @@ export const postsService = {
         if(!post) return null;
 
         let myStatus = LikeStatus.None
-        const latestLikes = post.likes?.sort((a, b) => Date.parse(b.addedAt) - Date.parse(a.addedAt))
+        const latestLikes = post.likes?.sort((a, b) => Date.parse(b.addedAt) - Date.parse(a.addedAt)).slice(0, 3)
 
         if (userId) {
             const isLiked = post.likes?.find(u => u.userId.toString() === userId)
